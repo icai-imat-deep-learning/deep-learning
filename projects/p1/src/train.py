@@ -5,6 +5,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 # other libraries
 from tqdm.auto import tqdm
+from typing import Final
 
 # own modules
 from src.utils import load_data, save_model
@@ -12,7 +13,8 @@ from src.models import MyModel
 from src.train_functions import train_step, val_step
 
 # static variables
-DATA_PATH = "data/train.csv"
+DATA_PATH: Final[str] = "data"
+NUM_CLASSES: Final[int] = 10
 
 # set device
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -20,37 +22,36 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 def main() -> None:
     """
-    This function is the main program
+    This function is the main program for training.
     """
 
     # hyperparameters
     epochs: int = 100
     lr: float = 1e-3
     batch_size: int = 64
+    hidden_sizes: tuple[int, ...] = (256, 128, 64)
 
     # load data
     train_data: DataLoader
     val_data: DataLoader
-    counts: tuple[float, float]
-    train_data, val_data, counts = load_data(DATA_PATH, 64)
+    train_data, val_data, _ = load_data(DATA_PATH, batch_size=64)
 
     # define name and writer
-    name: str = f"e_{epochs}"
+    name: str = f"model_lr_{lr}_hs_{hidden_sizes}_{batch_size}_{epochs}"
     writer: SummaryWriter = SummaryWriter(f"runs/{name}")
 
     # define model
-    inputs: torch.Tensor = next(iter(train_data))
-    model: torch.nn.Module = MyModel(inputs.shape[0], 1, (256, 128, 64)).to(device)
+    inputs: torch.Tensor = next(iter(train_data))[0]
+    model: torch.nn.Module = MyModel(
+        inputs.shape[2] * inputs.shape[3], NUM_CLASSES, hidden_sizes=hidden_sizes
+    ).to(device)
 
     # define loss and optimizer
-    pos_weight: torch.Tensor = torch.empty(batch_size)
-    loss: torch.nn.Module = torch.nn.BCEWithLogitsLoss(
-        pos_weight=torch.tensor([counts[0] / counts[1]])
-    )
+    loss: torch.nn.Module = torch.nn.CrossEntropyLoss()
     optimizer: torch.optim.Optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     # train loop
-    for epoch in tqdm(epochs):
+    for epoch in tqdm(range(epochs)):
         # call train step
         train_step(model, train_data, loss, optimizer, writer, epoch, device)
 

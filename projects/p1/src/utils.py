@@ -1,9 +1,11 @@
 # deep learning libraries
 import torch
+import torchvision
 import numpy as np
 import pandas as pd
 from torch.jit import RecursiveScriptModule
 from torch.utils.data import Dataset, DataLoader, random_split
+from torchvision import transforms
 
 # other libraries
 import os
@@ -11,78 +13,66 @@ import random
 
 
 def load_data(
-    path: str, batch_size: int
-) -> tuple[DataLoader, DataLoader, tuple[float, float]]:
-    # load raw data
-    X: np.ndarray
-    y: np.ndarray
-    X, y = load_raw_data(path)
-
-    counts_array: np.ndarray
-    _, counts_array = np.unique(y, return_counts=True)
-    counts_array = counts_array * 100 / len(y)
-    counts: tuple[float, float] = (counts[0], counts[1])
-
-    # create dataset
-    dataset: Dataset = MyDataset(X, y)
-
-    # split into train and val
-    train_dataset: Dataset
-    val_dataset: Dataset
-    train_dataset, val_dataset = random_split(dataset, [0.8, 0.2])
-
-    # define dataloaders
-    train_dataloader: DataLoader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True
-    )
-    val_dataloader: DataLoader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True
-    )
-
-    return train_dataloader, val_dataloader, counts
-
-
-def load_raw_data(path: str) -> tuple[np.ndarray, np.ndarray]:
+    path: str, batch_size: int = 128
+) -> tuple[DataLoader, DataLoader, DataLoader]:
     """
-    This function loads the raw data from a csv
+    This function loads the data from mnist dataset. All batches must
+    be equal size.
 
     Args:
-        path: path of the csv file
+        path: path to save the datasets (train and test).
+        batch_size: batch size. Defaults to 128.
 
     Returns:
-        tuple of numpy arrays, the inputs and the targets respectively
+        tuple of three dataloaders, train and test in respective order.
     """
 
-    df = pd.read_csv(path)
-    y = df["TARGET"].to_numpy()
-    df = df.drop(["ID", "TARGET"], axis=1)
-    X = df.to_numpy()
+    # define transforms
+    transformations = transforms.Compose([transforms.ToTensor()])
 
-    return X, y
+    # load datasets
+    train_dataset = torchvision.datasets.MNIST(
+        root=path, train=True, download=True, transform=transformations
+    )
+    val_dataset: Dataset
+    train_dataset, val_dataset = random_split(train_dataset, [0.8, 0.2])
+    test_dataset = torchvision.datasets.MNIST(
+        root=path, train=False, download=True, transform=transformations
+    )
+
+    # define dataloaders
+    train_dataloader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True, drop_last=True
+    )
+    val_dataloader = DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=True, drop_last=True
+    )
+    test_dataloader = DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=True, drop_last=True
+    )
+
+    return train_dataloader, val_dataloader, test_dataloader
 
 
-class MyDataset(Dataset):
-    def __init__(self, X: np.ndarray, y: np.ndarray) -> None:
-        self.X = X
-        self.y = y
+def save_model(model: torch.nn.Module, name: str) -> None:
+    """
+    This function saves a model in the 'models' folder as a torch.jit.
+    It should create the 'models' if it doesn't already exist.
 
-    def __len__(self) -> int:
-        return self.X.shape[0]
+    Args:
+        model: pytorch model.
+        name: name of the model (without the extension, e.g. name.pt).
+    """
 
-    def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
-        inputs: torch.Tensor = torch.from_numpy(self.X[index])
-        target: int = self.y[index]
-
-        return inputs, target
-
-
-def save_model(model, name) -> None:
+    # create folder if it does not exist
     if os.path.isdir("models"):
         os.makedirs("models")
 
     # save scripted model
     model_scripted = torch.jit.script(model.cpu())
     model_scripted.save(f"models/{name}.pt")
+
+    return None
 
 
 def set_seed(seed: int) -> None:
@@ -111,3 +101,29 @@ def set_seed(seed: int) -> None:
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 
     return None
+
+
+def accuracy(predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+    """
+    This function computes the accuracy.
+
+    Args:
+        predictions: predictions tensor. Dimensions:
+            [batch, num classes] or [batch].
+        targets: targets tensor. Dimensions: [batch, 1] or [batch].
+
+    Returns:
+        the accuracy in a tensor of a single element.
+    """
+
+    # eliminate extra dimension
+    if len(targets.shape) > 1:
+        targets.squeeze(1)
+
+    # compute predictions
+    predictions = torch.argmax(predictions, dim=1)
+
+    # compute accuracy
+    accuracy: torch.Tensor = (predictions == targets).sum() / predictions.shape[0]
+
+    return accuracy
