@@ -20,7 +20,7 @@ def load_data(
     be equal size. The division between train and val must be 0.8-0.2.
 
     Args:
-        path: path to save the datasets.
+        path: path to save the datasets (train and test).
         batch_size: batch size. Defaults to 128.
 
     Returns:
@@ -30,7 +30,28 @@ def load_data(
     # define transforms
     transformations = transforms.Compose([transforms.ToTensor()])
 
-    # TODO
+    # load datasets
+    train_dataset = torchvision.datasets.MNIST(
+        root=path, train=True, download=True, transform=transformations
+    )
+    val_dataset: Dataset
+    train_dataset, val_dataset = random_split(train_dataset, [0.8, 0.2])
+    test_dataset = torchvision.datasets.MNIST(
+        root=path, train=False, download=True, transform=transformations
+    )
+
+    # define dataloaders
+    train_dataloader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True, drop_last=True
+    )
+    val_dataloader = DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=True, drop_last=True
+    )
+    test_dataloader = DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=True, drop_last=True
+    )
+
+    return train_dataloader, val_dataloader, test_dataloader
 
 
 def save_model(model: torch.nn.Module, name: str) -> None:
@@ -95,4 +116,14 @@ def accuracy(predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
         the accuracy in a tensor of a single element.
     """
 
-    # TODO
+    # eliminate extra dimension
+    if len(targets.shape) > 1:
+        targets.squeeze(1)
+
+    # compute predictions
+    predictions = torch.argmax(predictions, dim=1)
+
+    # compute accuracy
+    accuracy: torch.Tensor = (predictions == targets).sum() / predictions.shape[0]
+
+    return accuracy

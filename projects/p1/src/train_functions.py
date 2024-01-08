@@ -33,36 +33,12 @@ def train_step(
     # define metric lists
     losses: list[float] = []
     accuracies: list[float] = []
-
-    # activate train mode
-    model.train()
-
-    # iter over training data
-    inputs: torch.Tensor
-    targets: torch.Tensor
-    for inputs, targets in train_data:
-        # pass objects to correct device
-        inputs = inputs.to(device)
-        targets = targets.to(device)
-
-        # compute outputs and loss
-        outputs: torch.Tensor = model(inputs).squeeze(1)
-        loss_value: torch.Tensor = loss(outputs, targets)
-
-        # optimize
-        optimizer.zero_grad()
-        loss_value.backward()
-        optimizer.step()
-
-        # add metris to lists
-        losses.append(loss_value.item())
-        accuracies.append(accuracy(outputs, targets).item())
-
+    
+    # TODO
+    
     # write on tensorboard
     writer.add_scalar("train/loss", np.mean(losses), epoch)
     writer.add_scalar("train/accuracy", np.mean(accuracies), epoch)
-
-    return None
 
 
 def val_step(
@@ -85,35 +61,7 @@ def val_step(
         device: device of model.
     """
 
-    # define metric lists
-    losses: list[float] = []
-    accuracies: list[float] = []
-
-    # activate train mode
-    model.eval()
-
-    with torch.no_grad():
-        # iter over val data
-        inputs: torch.Tensor
-        targets: torch.Tensor
-        for inputs, targets in val_data:
-            # pass objects to correct device
-            inputs = inputs.to(device)
-            targets = targets.to(device)
-
-            # compute outputs and loss
-            outputs: torch.Tensor = model(inputs).squeeze(1)
-            loss_value: torch.Tensor = loss(outputs, targets)
-
-            # add metris to lists
-            losses.append(loss_value.item())
-            accuracies.append(accuracy(outputs, targets).item())
-
-    # write on tensorboard
-    writer.add_scalar("val/loss", np.mean(losses), epoch)
-    writer.add_scalar("val/accuracy", np.mean(accuracies), epoch)
-
-    return None
+    # TODO
 
 
 def test_step(
@@ -128,29 +76,9 @@ def test_step(
         model: pytorch model.
         val_data: dataloader of test data.
         device: device of model.
+        
+    Returns:
+        average accuracy.
     """
 
-    # define metric lists
-    accuracies: list[float] = []
-
-    # activate train mode
-    model.eval()
-
-    with torch.no_grad():
-        # iter over val data
-        inputs: torch.Tensor
-        targets: torch.Tensor
-        for inputs, targets in test_data:
-            # pass objects to correct device
-            inputs = inputs.to(device)
-            targets = targets.to(device)
-
-            # compute outputs and loss
-            outputs: torch.Tensor = model(inputs).squeeze(1)
-
-            # add metris to lists
-            accuracies.append(accuracy(outputs, targets).item())
-
-    accuracy_mean: float = float(np.mean(accuracies))
-
-    return accuracy_mean
+    # TODO
