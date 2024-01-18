@@ -14,12 +14,12 @@ These tests are already provided to you, you can run them by executing
 
 ## Inspection of the code
 
-These 3 ponts are meant to assess things that cannot be measured by automatic testing, as code tyle and organization.
+These 3 points are meant to assess things that cannot be measured by automatic testing, as code tyle and organization.
 
 
 ## Parts of the project
 
-We recommend the student to fllow the order we present in this section since it is the most easy and natural one to complete the project.
+We recommend the student to follow the order we present in this section since it is the easiest and mosre natural one to complete the project.
 
 ### load_data function (QA test, 1 point)
 
@@ -55,5 +55,5 @@ This function is contained in the src.utils module and must be completed to comp
 
 ### Performance (2 points)
 
-This is nto a specific function but a performance you should achieve with your best model in the test set. A performance higher than 94% would have a score of 1 point, higher than 96% 1.5 and higher than 97% 2 points. You should try to play with the hyperparameters and then rename you best model as best_model.pt inside the models folder.
+This is not a specific function but a performance you should achieve with your best model in the test set. A performance higher than 94% would have a score of 1 point, higher than 96% 1.5 and higher than 97% 2 points. You should try to play with the hyperparameters and then rename you best model as best_model.pt inside the models folder.
 
