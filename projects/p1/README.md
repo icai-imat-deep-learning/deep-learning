@@ -33,7 +33,12 @@ We recommend the student to follow the order we present in this section since it
 
 ### load_data function (QA test, 1 point)
 
-This function is contained in the src.utils module and must be completed to load the three dataloaders of train, val and test in respective order. In order to do that, the division between train and val must be 0.8-0.2. Finally, all batches should be equal size.   
+This function is contained in the src.utils module and must be completed to load the three dataloaders of train, val and test in respective order. In order to do that, the division between train and val must be 0.8-0.2. Finally, all batches should be equal size.  
+
+To execute the unit test implemented to assure the correct implementation of the load_data function, run:
+pytest tests/test_utils.py::test_load_data
+
+This will be analog for the rest of the functions.
 
 ### ReLU class (QA test, 1 point)
 
