@@ -2,6 +2,14 @@
 
 This project will be graded in the following way, 7 points will be graded by automtic tests, that can be verified by the criteria of a professor if it is neccesary. The remaining 3 points will come from the inspection of the code by a professor.
 
+The goal of this first lab is to implement the required source code to train and test a neural network to recognize cyphers based on the common dataset denominated MNIST (https://www.kaggle.com/datasets/hojjatk/mnist-dataset).
+
+This dataset consists on a large set of handwritten digits. The provided source code is a pytorch project with the function to load data, train the data, test it and extract metrics. Parts of the source code is missing and your will have to complete it to be able to successfully train the network.
+
+As commented below, we recommend you to implement the source code sequentially step by step and its corresponding test (QA or quality assurance) to evidence the correct behaviour of each part that you develop. 
+
+The first thing you will have to do is installing the required dependencies, defined in the file "requirements.txt".
+
 ## Structure of the repo
 
 
@@ -10,6 +18,8 @@ This project will be graded in the following way, 7 points will be graded by aut
 These tests are already provided to you, you can run them by executing 
 
     pytest .
+
+At the beginning these test will fail and you will have to implement the required functions properly for them to be set as PASS.
 
 
 ## Inspection of the code
@@ -31,7 +41,7 @@ This class is contained in the src.models and must be completed using only matri
 
 ### Linear class (QA test, 1 point)
 
-This class is contained in the src.models and must be completed using only matrix operations. The conventiions used must be the PyTorch ones.
+This class is contained in the src.models and must be completed using only matrix operations. The conventions used must be the PyTorch ones.
 
 ### MyModel class (QA test, 1 point)
 
@@ -39,7 +49,7 @@ This class is contained in the src.models and must be completed by calling the L
 
 ### Train step (Inspection)
 
-This is the training step for each epoch. It should traing the paremeters, compute the average loss and accuracy and log them into tensorboard.
+This is the training step for each epoch. It should train the paremeters, compute the average loss and accuracy and log them into tensorboard.
 
 ### Validation step (Inspection)
 
@@ -55,5 +65,5 @@ This function is contained in the src.utils module and must be completed to comp
 
 ### Performance (2 points)
 
-This is not a specific function but a performance you should achieve with your best model in the test set. A performance higher than 94% would have a score of 1 point, higher than 96% 1.5 and higher than 97% 2 points. You should try to play with the hyperparameters and then rename you best model as best_model.pt inside the models folder.
+This is not a specific function but a performance you should achieve with your best model in the test set. A performance higher than 94% would have a score of 1 point, higher than 96% 1.5 and higher than 97% 2 points. You should try to play with the hyperparameters and then rename you best model as best_model.pt inside the models folder. Please note that the test implemented for the performance part will fail if your train model does not reach the accuracy thresholds defined above.
 
