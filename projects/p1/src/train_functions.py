@@ -4,6 +4,9 @@ import numpy as np
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
+# own modules
+from src.utils import accuracy
+
 
 def train_step(
     model: torch.nn.Module,
@@ -14,38 +17,28 @@ def train_step(
     epoch: int,
     device: torch.device,
 ) -> None:
+    """
+    This function computes the training step.
+
+    Args:
+        model: pytorch model.
+        train_data: train dataloader.
+        loss: loss function.
+        optimizer: optimizer object.
+        writer: tensorboard writer.
+        epoch: epoch number.
+        device: device of model.
+    """
+
     # define metric lists
-    losses: list[float]
+    losses: list[float] = []
     accuracies: list[float] = []
-
-    # activate train mode
-    model.train()
-
-    # iter over training data
-    inputs: torch.Tensor
-    targets: torch.Tensor
-    for inputs, targets in train_data:
-        # pass objects to correct device
-        inputs = inputs.to(device)
-        targets = targets.to(device)
-
-        # compute outputs and loss
-        outputs: torch.Tensor = model(inputs).unsqueeze(1)
-        loss_value: torch.Tensor = loss(outputs, targets)
-
-        # optimize
-        optimizer.zero_grad()
-        loss_value.backward()
-        optimizer.step()
-
-        # add metris to lists
-        losses.append(loss_value.item())
-        accuracies.append(loss_value.item())
-
+    
+    # TODO
+    
     # write on tensorboard
     writer.add_scalar("train/loss", np.mean(losses), epoch)
-
-    return None
+    writer.add_scalar("train/accuracy", np.mean(accuracies), epoch)
 
 
 def val_step(
@@ -56,31 +49,36 @@ def val_step(
     epoch: int,
     device: torch.device,
 ) -> None:
-    # define metric lists
-    losses: list[float]
-    accuracies: list[float] = []
+    """
+    This function computes the validation step.
 
-    # activate train mode
-    model.eval()
+    Args:
+        model: pytorch model.
+        val_data: dataloader of validation data.
+        loss: loss function.
+        writer: tensorboard writer.
+        epoch: epoch number.
+        device: device of model.
+    """
+    
+    # TODO
 
-    with torch.no_grad():
-        # iter over val data
-        inputs: torch.Tensor
-        targets: torch.Tensor
-        for inputs, targets in val_data:
-            # pass objects to correct device
-            inputs = inputs.to(device)
-            targets = targets.to(device)
 
-            # compute outputs and loss
-            outputs: torch.Tensor = model(inputs).unsqueeze(1)
-            loss_value: torch.Tensor = loss(outputs, targets)
+def test_step(
+    model: torch.nn.Module,
+    test_data: DataLoader,
+    device: torch.device,
+) -> float:
+    """
+    This function computes the test step.
 
-            # add metris to lists
-            losses.append(loss_value.item())
-            accuracies.append(loss_value.item())
+    Args:
+        model: pytorch model.
+        val_data: dataloader of test data.
+        device: device of model.
+        
+    Returns:
+        average accuracy.
+    """
 
-    # write on tensorboard
-    writer.add_scalar("val/loss", np.mean(losses), epoch)
-
-    return None
+    # TODO
