@@ -12,6 +12,8 @@ The first thing you will have to do is installing the required dependencies, def
 
 To log the metrics during training and validation, we will be using tensorboard. You shall have it installed after installing the dependencies defined in "requirements.txt". Install also the extension of vs code for tensorboard. 
 
+IMPORTANT: You will have to upload your implementation as a zip-file into Moodle.
+
 ## Structure of the repo
 
 
