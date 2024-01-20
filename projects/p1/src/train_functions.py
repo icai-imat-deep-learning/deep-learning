@@ -60,7 +60,7 @@ def val_step(
         epoch: epoch number.
         device: device of model.
     """
-
+    
     # TODO
 
 
