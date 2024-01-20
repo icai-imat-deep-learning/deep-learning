@@ -34,7 +34,27 @@ def train_step(
     losses: list[float] = []
     accuracies: list[float] = []
     
-    # TODO
+    # TODO. Activate train mode
+    
+
+    # TODO. iterate over training data
+    inputs: torch.Tensor
+    targets: torch.Tensor
+    for inputs, targets in train_data:
+        # pass objects to correct device
+        inputs = inputs.to(device)
+        targets = targets.to(device)
+
+        # TODO. compute outputs and loss (both are tensors)
+        
+        # optimize
+        optimizer.zero_grad()
+        loss_value.backward()
+        optimizer.step()
+
+        # add metris to lists
+        losses.append(loss_value.item())
+        accuracies.append(accuracy(outputs, targets).item())
     
     # write on tensorboard
     writer.add_scalar("train/loss", np.mean(losses), epoch)
@@ -60,8 +80,27 @@ def val_step(
         epoch: epoch number.
         device: device of model.
     """
+    # define metric lists
+    losses: list[float] = []
+    accuracies: list[float] = []
 
-    # TODO
+    # activate eval mode
+
+    with torch.no_grad():
+        inputs: torch.Tensor
+        targets: torch.Tensor
+        for inputs, targets in val_data:
+            # TODO. iter over val data (similar as above in the train function)
+            
+            # TODO. compute outputs and loss
+
+            # TODO. add metris to lists
+
+    # write on tensorboard
+    writer.add_scalar("val/loss", np.mean(losses), epoch)
+    writer.add_scalar("val/accuracy", np.mean(accuracies), epoch)
+
+    return None
 
 
 def test_step(
@@ -81,4 +120,21 @@ def test_step(
         average accuracy.
     """
 
-    # TODO
+    # define metric lists
+    accuracies: list[float] = []
+
+    # TODO. activate eval mode
+
+    with torch.no_grad():
+        # TODO. iter over val data
+        for inputs, targets in test_data:
+            # TODO. pass objects to correct device
+
+            # TODO. compute outputs (output of the model)
+
+            # add metris to lists
+            accuracies.append(accuracy(outputs, targets).item())
+
+    #TODO. Calculate the accuracy mean
+
+    return accuracy_mean

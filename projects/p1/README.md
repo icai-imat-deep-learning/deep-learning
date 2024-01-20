@@ -10,6 +10,8 @@ As commented below, we recommend you to implement the source code sequentially s
 
 The first thing you will have to do is installing the required dependencies, defined in the file "requirements.txt".
 
+To log the metrics during training and validation, we will be using tensorboard. You shall have it installed after installing the dependencies defined in "requirements.txt". Install also the extension of vs code for tensorboard. 
+
 ## Structure of the repo
 
 
@@ -54,7 +56,7 @@ This class is contained in the src.models and must be completed by calling the L
 
 ### Train step (Inspection)
 
-This is the training step for each epoch. It should train the paremeters, compute the average loss and accuracy and log them into tensorboard.
+Implement the train functions to make the file train.py executable. This is the training step for each epoch. It should train the paremeters, compute the average loss and accuracy and log them into tensorboard. Check the graphic shown in tensorboard for the train loss and makes sure that it converges to zero after training has finished.
 
 ### Validation step (Inspection)
 

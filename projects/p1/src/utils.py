@@ -30,7 +30,15 @@ def load_data(
     # define transforms
     transformations = transforms.Compose([transforms.ToTensor()])
 
-    # TODO
+    # TODO. load MNIST train and test datasets
+    
+    val_dataset: Dataset
+    #TODO. Perform the split between train and validation considering the README indications
+    
+
+    # TODO. define dataloaders for train, val and test 
+    
+    return train_dataloader, val_dataloader, test_dataloader
 
 
 def save_model(model: torch.nn.Module, name: str) -> None:
@@ -95,4 +103,13 @@ def accuracy(predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
         the accuracy in a tensor of a single element.
     """
 
-    # TODO
+    # eliminate extra dimension
+    if len(targets.shape) > 1:
+        targets.squeeze(1)
+
+    # compute predictions
+    predictions = torch.argmax(predictions, dim=1)
+
+    # TODO. compute accuracy
+
+    return accuracy

@@ -12,7 +12,8 @@ class ReLU(torch.nn.Module):
         This method is the constructor of the ReLU layer.
         """
 
-        # TODO
+        # call super class constructor
+        super().__init__()
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -25,7 +26,9 @@ class ReLU(torch.nn.Module):
             outputs tensor. Dimensions: [*] (same as the input).
         """
 
-        # TODO
+        # TODO. clone inputs
+
+        # TODO. put at zero negative elements (behavior of the ReLu)
 
 
 class Linear(torch.nn.Module):
@@ -41,8 +44,16 @@ class Linear(torch.nn.Module):
             input_dim: input dimension.
             output_dim: output dimension.
         """
+        # call super class constructor
+        super().__init__()
 
-        # TODO
+        # define attributes
+        self.weights: torch.nn.Parameter = torch.nn.Parameter(
+            torch.rand(input_dim, output_dim)
+        )
+        self.bias: torch.nn.Parameter = torch.nn.Parameter(torch.rand(1, output_dim))
+
+        return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -55,7 +66,8 @@ class Linear(torch.nn.Module):
             outputs tensor. Dimensions: [batch, output dim].
         """
 
-        # TODO
+        # TODO. You will have to implement the calculation of the variable "outputs" which is a 
+        # multiplication of two torch tensors (inputs and weights) plus the bias. Use the proper torch function
 
 
 class MyModel(torch.nn.Module):
@@ -75,8 +87,14 @@ class MyModel(torch.nn.Module):
             output_size: size of the output
             hidden_sizes: three hidden sizes of the model
         """
+        # call super class constructor
+        super().__init__()
 
-        # TODO
+        # define relu
+        self.relu: torch.nn.Module = ReLU()
+
+        # TODO. Define the layers using the Linear function defined above. Take into consideration
+        # the args mentioned in the header of the function
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -89,5 +107,7 @@ class MyModel(torch.nn.Module):
         Returns:
             outputs of the model. Dimensions: [batch, 1].
         """
-
-        # TODO
+        # call layers
+        outputs: torch.Tensor = torch.flatten(inputs, start_dim=1)
+        # TODO. Implement the forward pass through the above-defined layers. 
+        # Include a ReLu between each call to each layer
