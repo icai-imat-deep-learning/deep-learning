@@ -20,7 +20,7 @@ def test_accuracy(data_path: str) -> None:
     """
     This is the test for the accuracy in the test set.
     """
-    
+
     test_data: DataLoader
     _, _, test_data = load_data(data_path, batch_size=64)
 
@@ -29,13 +29,13 @@ def test_accuracy(data_path: str) -> None:
 
     # call evaluate
     accuracy_value: float = test_step(model, test_data, device)
-    
+
     # check if accuracy is higher than 92%
     assert accuracy_value > 0.92, "Accuracy not higher than 92%"
-    
+
     # check if accuracy is higher than 95%
     assert accuracy_value > 0.95, "Accuracy not higher than 95%"
-    
+
     # check if accuracy is higher than 92%
     assert accuracy_value > 0.97, "Accuracy not higher than 97%"
 
