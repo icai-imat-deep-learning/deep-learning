@@ -33,9 +33,9 @@ def train_step(
     # define metric lists
     losses: list[float] = []
     accuracies: list[float] = []
-    
+
     # TODO
-    
+
     # write on tensorboard
     writer.add_scalar("train/loss", np.mean(losses), epoch)
     writer.add_scalar("train/accuracy", np.mean(accuracies), epoch)
@@ -60,7 +60,7 @@ def val_step(
         epoch: epoch number.
         device: device of model.
     """
-    
+
     # TODO
 
 
@@ -76,7 +76,7 @@ def test_step(
         model: pytorch model.
         val_data: dataloader of test data.
         device: device of model.
-        
+
     Returns:
         average accuracy.
     """

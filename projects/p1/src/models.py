@@ -41,7 +41,7 @@ class Linear(torch.nn.Module):
             input_dim: input dimension.
             output_dim: output dimension.
         """
-        
+
         # TODO
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
@@ -89,5 +89,5 @@ class MyModel(torch.nn.Module):
         Returns:
             outputs of the model. Dimensions: [batch, 1].
         """
-        
+
         # TODO

@@ -32,10 +32,10 @@ def test_block(input_channels: int, output_channels: int, stride: int) -> None:
 
     # check length
     assert len(list(block.children())[0]) == 6, "Incorrect length "
-    
+
     if isinstance(list(block.children())[0], torch.nn.Sequential):
         sequential: torch.nn.Sequential = list(block.children())[0]
-        
+
         # check stride 1 in first conv layer
         assert list(block.children())[0][0].stride == (
             1,

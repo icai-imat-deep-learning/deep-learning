@@ -18,7 +18,7 @@ def test_load_data(data_path: str) -> None:
     Args:
         data_path: path of the data.
     """
-    
+
     datasets: tuple[DataLoader, DataLoader, DataLoader] = load_data(
         data_path, batch_size=64
     )
@@ -55,10 +55,10 @@ def test_accuracy() -> None:
     """
     This is the test for teh accuracy function.
     """
-    
+
     # set seed
     set_seed(42)
-    
+
     # define predictions and target
     predictions: torch.Tensor = torch.rand(64, 10)
     targets: torch.Tensor = torch.argmax(predictions, dim=1)

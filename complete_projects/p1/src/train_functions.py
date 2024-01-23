@@ -128,7 +128,7 @@ def test_step(
         model: pytorch model.
         val_data: dataloader of test data.
         device: device of model.
-        
+
     Returns:
         average accuracy.
     """
