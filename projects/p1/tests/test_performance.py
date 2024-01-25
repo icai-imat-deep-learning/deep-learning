@@ -8,7 +8,7 @@ import pytest
 
 # own modules
 from src.utils import load_data
-from src.train_functions import test_step
+from src.train_functions import t_step
 
 # set device
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -28,7 +28,7 @@ def test_accuracy(data_path: str) -> None:
     model: RecursiveScriptModule = torch.jit.load("models/best_model.pt").to(device)
 
     # call evaluate
-    accuracy_value: float = test_step(model, test_data, device)
+    accuracy_value: float = t_step(model, test_data, device)
 
     # check if accuracy is higher than 92%
     assert accuracy_value > 0.92, "Accuracy not higher than 92%"

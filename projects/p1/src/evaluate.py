@@ -10,7 +10,7 @@ from typing import Final
 # own modules
 from src.utils import load_data, save_model
 from src.models import MyModel
-from src.train_functions import test_step
+from src.train_functions import t_step
 
 # static variables
 DATA_PATH: Final[str] = "data"
@@ -36,7 +36,7 @@ def main() -> None:
     model: RecursiveScriptModule = torch.jit.load(f"models/{name}.pt").to(device)
 
     # call test step and evaluate accuracy
-    accuracy: float = test_step(model, test_data, device)
+    accuracy: float = t_step(model, test_data, device)
     print(f"accuracy: {accuracy}")
 
     return None
