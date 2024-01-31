@@ -52,8 +52,8 @@ class ImagenetteDataset(Dataset):
             index: index of the element in the dataset.
 
         Returns:
-            image. Dimensions: [channels, height, width]
-                label.
+            tuple with image and label. Image dimensions:
+                [channels, height, width].
         """
 
         # load image path and label
