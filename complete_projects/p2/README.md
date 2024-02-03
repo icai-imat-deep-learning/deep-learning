@@ -1,6 +1,6 @@
 # Project 2
 
-This project will be graded in the following way, 8 points will be graded by automatic tests, that can be verified by the criteria of a professor if it is necessary. The remaining 2 points will come from the inspection of the code by a professor.
+This project will be graded in the following way, 8 points will be graded by automatic tests, that can be verified by the criteria of a professor if it is necessary. The remaining 2 points will come from the inspection of the code by a professor. https://web.eecs.umich.edu/~justincj/teaching/eecs442/notes/linear-backprop.html
 
 # Structure of the repo
 In this repo, all the functional code is inside the src/ folder. For training the model and save it, the following module must be run:

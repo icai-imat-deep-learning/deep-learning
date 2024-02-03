@@ -83,7 +83,7 @@ def load_imagenette_data(
             Default value: 0.
 
     Returns:
-        tuple of dataloaders, train and val, in respective order.
+        tuple of dataloaders, train, val and test in respective order.
     """
 
     # download folders if they are not present
@@ -116,10 +116,10 @@ def load_imagenette_data(
 
 def download_data(path: str) -> None:
     """
-    This function downloads the data from internet
+    This function downloads the data from internet.
 
     Args:
-        path: path to dave the data
+        path: path to dave the data.
     """
 
     # define paths
@@ -165,6 +165,79 @@ def download_data(path: str) -> None:
     shutil.rmtree(f"{path}/imagenette2")
 
     return None
+
+
+def parameters_to_double(model: torch.nn.Module) -> None:
+    """
+    This function transforms the model parameters to float.
+
+    Args:
+        model: pytorch model.
+    """
+
+    # iterate over model parameters
+    parameter: torch.Tensor
+    for parameter in model.parameters():
+        parameter.data = parameter.data.double()
+
+    return None
+
+
+class Accuracy:
+    correct: int
+    total: int
+
+    def __init__(self) -> None:
+        """
+        This is the constructor of Accuracy class. It should
+        initialize correct and total to zero.
+        """
+
+        self.correct = 0
+        self.num_total = 0
+
+    def update(self, logits: torch.Tensor, labels: torch.Tensor) -> None:
+        """
+        This method update the value of correct and total counts.
+
+        Args:
+            logits: outputs of the model. Dimensions: [batch]
+            labels: labels of the examples. Dimensions: [batch].
+
+        Returns:
+            _description_
+        """
+
+        # compute predictions
+        predictions = logits.argmax(1).type_as(labels)
+
+        # update counts
+        self.correct += int(predictions.eq(labels).sum().item())
+        self.total += labels.shape[0]
+
+        return None
+
+    def compute(self) -> float:
+        """
+        This method returns the accuracy value.
+
+        Returns:
+            accuracy value.
+        """
+
+        return self.correct / self.total
+
+    def reset(self) -> None:
+        """
+        This method resets to zero the count of correct and total number of
+        examples.
+        """
+
+        # init to zero the counts
+        self.correct = 0
+        self.total = 0
+
+        return None
 
 
 def set_seed(seed: int) -> None:

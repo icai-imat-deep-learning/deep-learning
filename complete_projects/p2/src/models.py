@@ -3,6 +3,7 @@ import torch
 import torch.nn.functional as F
 
 # other libraries
+import math
 from typing import Callable
 
 
@@ -85,7 +86,9 @@ class Linear(torch.nn.Module):
 
     def __init__(self, input_dim: int, output_dim: int) -> None:
         """
-        This method is the constructor of the Linear layer. Follow the pytorch convention.
+        This method is the constructor of the Linear layer.
+        The attributes must be named the same as the parameters of the
+        linear layer in pytorch. The parameters should be initialized
 
         Args:
             input_dim: input dimension.
@@ -97,10 +100,14 @@ class Linear(torch.nn.Module):
 
         # define attributes
         self.weight: torch.nn.Parameter = torch.nn.Parameter(
-            torch.rand(output_dim, input_dim)
+            torch.empty(output_dim, input_dim)
         )
-        self.bias: torch.nn.Parameter = torch.nn.Parameter(torch.rand(output_dim))
+        self.bias: torch.nn.Parameter = torch.nn.Parameter(torch.empty(output_dim))
 
+        # init parameters corectly
+        self.reset_parameters()
+
+        # define layer function
         self.fn = LinearFunction.apply
 
         return None
@@ -118,6 +125,21 @@ class Linear(torch.nn.Module):
 
         return self.fn(inputs, self.weight, self.bias)
 
+    def reset_parameters(self) -> None:
+        """
+        This method initializes the parameters in the correct way.
+        Look for this method into pytorch source code and copy it here.
+        """
+
+        # init parameters the correct way
+        torch.nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+        if self.bias is not None:
+            fan_in, _ = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
+            bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
+            torch.nn.init.uniform_(self.bias, -bound, bound)
+
+        return None
+
 
 class Conv2dFunction(torch.autograd.Function):
     """
@@ -126,7 +148,12 @@ class Conv2dFunction(torch.autograd.Function):
 
     @staticmethod
     def forward(
-        ctx, inputs: torch.Tensor, weight: torch.Tensor, bias: torch.Tensor
+        ctx,
+        inputs: torch.Tensor,
+        weight: torch.Tensor,
+        bias: torch.Tensor,
+        padding: int,
+        stride: int,
     ) -> torch.Tensor:
         """
         This function is the forward method of the class.
@@ -143,10 +170,14 @@ class Conv2dFunction(torch.autograd.Function):
         """
 
         # save elements for the backward
-        ctx.save_for_backward(inputs, weight, bias)
+        ctx.save_for_backward(
+            inputs, weight, bias, torch.tensor(padding), torch.tensor(stride)
+        )
 
         # unfold inputs and compute outputs
-        inputs_unfolded: torch.Tensor = F.unfold(inputs, weight.shape[2])
+        inputs_unfolded: torch.Tensor = F.unfold(
+            inputs, weight.shape[2], padding=padding, stride=stride
+        )
         outputs_unfolded: torch.Tensor = torch.matmul(
             inputs_unfolded.transpose(1, 2),
             weight.view(weight.size(0), -1).t().unsqueeze(0),
@@ -154,12 +185,14 @@ class Conv2dFunction(torch.autograd.Function):
 
         # compute fold outputs
         output_width_height: int = inputs.shape[2] - weight.shape[2] + 1
-        outputs: torch.Tensor = F.fold(outputs_unfolded, output_width_height, 1)
+        outputs: torch.Tensor = F.fold(
+            outputs_unfolded, output_width_height, 1, padding=padding, stride=stride
+        )
 
         return outputs + bias.view(1, bias.shape[0], 1, 1)
 
     @staticmethod
-    def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:  # type: ignore
+    def backward(ctx, grad_output: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, None, None]:  # type: ignore
         """
         This is the backward of the layer.
 
@@ -172,11 +205,17 @@ class Conv2dFunction(torch.autograd.Function):
         """
 
         # load saved tensors
-        inputs, weight, bias = ctx.saved_tensors
+        inputs, weight, bias, padding, stride = ctx.saved_tensors
+        padding = padding.item()
+        stride = stride.item()
 
         # compute unfolded versions
-        inputs_unfolded: torch.Tensor = F.unfold(inputs, weight.shape[2])
-        grad_output_unfolded: torch.Tensor = F.unfold(grad_output, 1)
+        inputs_unfolded: torch.Tensor = F.unfold(
+            inputs, weight.shape[2], padding=padding, stride=stride
+        )
+        grad_output_unfolded: torch.Tensor = F.unfold(
+            grad_output, 1, padding=padding, stride=stride
+        )
         weights_unfolded: torch.Tensor = (
             weight.view(weight.size(0), -1).t().unsqueeze(0)
         )
@@ -186,7 +225,11 @@ class Conv2dFunction(torch.autograd.Function):
             weights_unfolded, grad_output_unfolded
         )
         grad_inputs: torch.Tensor = F.fold(
-            grad_inputs_unfolded, inputs.shape[2], weight.shape[2]
+            grad_inputs_unfolded,
+            inputs.shape[2],
+            weight.shape[2],
+            padding=padding,
+            stride=stride,
         )
 
         # compute weights grad
@@ -205,7 +248,7 @@ class Conv2dFunction(torch.autograd.Function):
         # compute bias grad
         grad_bias = torch.sum(torch.ones_like(grad_output) * grad_output, dim=(0, 2, 3))
 
-        return grad_inputs, grad_weight, grad_bias
+        return grad_inputs, grad_weight, grad_bias, None, None
 
 
 class Conv2d(torch.nn.Module):
@@ -214,7 +257,12 @@ class Conv2d(torch.nn.Module):
     """
 
     def __init__(
-        self, input_channels: int, output_channels: int, kernel_size: int
+        self,
+        input_channels: int,
+        output_channels: int,
+        kernel_size: int,
+        padding: int = 0,
+        stride: int = 1,
     ) -> None:
         """
         This method is the constructor of the Linear layer. Follow the
@@ -231,14 +279,20 @@ class Conv2d(torch.nn.Module):
 
         # define attributes
         self.weight: torch.nn.Parameter = torch.nn.Parameter(
-            torch.rand(
+            torch.empty(
                 output_channels, input_channels, kernel_size, kernel_size
             ).double()
         )
         self.bias: torch.nn.Parameter = torch.nn.Parameter(
-            torch.rand(output_channels).double()
+            torch.empty(output_channels).double()
         )
+        self.padding = padding
+        self.stride = stride
 
+        # init parameters corectly
+        self.reset_parameters()
+
+        # define layer function
         self.fn = Conv2dFunction.apply
 
         return None
@@ -256,7 +310,22 @@ class Conv2d(torch.nn.Module):
                 height - kernel size + 1, width - kernel size + 1].
         """
 
-        return self.fn(inputs, self.weight, self.bias)
+        return self.fn(inputs, self.weight, self.bias, self.padding, self.stride)
+
+    def reset_parameters(self) -> None:
+        """
+        This method initializes the parameters in the correct way.
+        Look for this method into pytorch source code and copy it here.
+        """
+
+        # init parameters the correct way
+        torch.nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+        if self.bias is not None:
+            fan_in, _ = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
+            bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
+            torch.nn.init.uniform_(self.bias, -bound, bound)
+
+        return None
 
 
 class Block(torch.nn.Module):
