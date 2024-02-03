@@ -167,6 +167,7 @@ def download_data(path: str) -> None:
     return None
 
 
+@torch.no_grad()
 def parameters_to_double(model: torch.nn.Module) -> None:
     """
     This function transforms the model parameters to float.

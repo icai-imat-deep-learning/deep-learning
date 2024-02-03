@@ -55,7 +55,7 @@ def main() -> None:
     writer = SummaryWriter(f"runs/{name}")
 
     # define model
-    model = CNNModel(output_channels=NUMBER_OF_CLASSES).to(device)
+    model = CNNModel((32, 64, 128), output_channels=NUMBER_OF_CLASSES).to(device)
 
     # define loss and optimizer
     loss = torch.nn.CrossEntropyLoss()

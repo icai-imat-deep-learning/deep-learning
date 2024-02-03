@@ -8,23 +8,41 @@ from typing import Callable
 
 
 class ReLUFunction(torch.autograd.Function):
-    """Both forward and backward are static methods."""
+    """
+    Class for the implementation of the forward and backward pass of
+    the ReLU.
+    """
 
     @staticmethod
-    def forward(ctx, inputs):
+    def forward(ctx, inputs: torch.Tensor) -> torch.Tensor:
+        """
+        _summary_
+
+        Args:
+            ctx: _description_
+            inputs: _description_
+
+        Returns:
+            _description_
+        """
+
+        # save tensors for the backward
         ctx.save_for_backward(inputs)
 
+        # compute forward
         outputs = inputs.clone()
         outputs[outputs <= 0] = 0
 
         return outputs
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: torch.Tensor) -> torch.Tensor:  # type: ignore
+        # load tensors from the forward
         (inputs,) = ctx.saved_tensors
 
-        grad_input = torch.ones_like(inputs)
-        grad_input[grad_input <= 0] = 0
+        #
+        grad_input: torch.Tensor = torch.ones_like(inputs)
+        grad_input[inputs <= 0] = 0
         grad_input *= grad_output
 
         return grad_input
@@ -397,7 +415,7 @@ class CNNModel(torch.nn.Module):
 
     def __init__(
         self,
-        layers: tuple[int, int, int] = (32, 64, 128),
+        hidden_sizes: tuple[int, ...],
         input_channels: int = 3,
         output_channels: int = 10,
     ) -> None:
@@ -421,7 +439,7 @@ class CNNModel(torch.nn.Module):
 
         # add 3 Blocks to module_list
         last_layer = 32
-        for layer in layers:
+        for layer in hidden_sizes:
             module_list.append(Block(last_layer, layer, stride=2))
             last_layer = layer
         self.cnn_net = torch.nn.Sequential(*module_list)
