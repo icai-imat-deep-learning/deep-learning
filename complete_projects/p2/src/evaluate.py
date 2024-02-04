@@ -1,18 +1,12 @@
 # deep learning libraries
 import torch
-import numpy as np
-from torch.utils.tensorboard import SummaryWriter
-
-# other libraries
-import os
-from tqdm.auto import tqdm
-from typing import Dict, Union, Literal
+from torch.jit import RecursiveScriptModule
 
 # own modules
-from src.models import CNNModel
 from src.utils import (
     load_imagenette_data,
     Accuracy,
+    load_model,
     set_seed,
 )
 
@@ -44,7 +38,7 @@ def main(name: str) -> float:
     ) = load_imagenette_data(DATA_PATH, batch_size=128, num_workers=4)
 
     # define model
-    model = CNNModel(output_channels=NUMBER_OF_CLASSES).to(device)
+    model: RecursiveScriptModule = load_model(name).to(device)
 
     # define accuracy
     accuracy: Accuracy = Accuracy()
@@ -63,4 +57,4 @@ def main(name: str) -> float:
 
 
 if __name__ == "__main__":
-    print(f"accuracy: {main('best_model.pt')}")
+    print(f"accuracy: {main('best_model')}")

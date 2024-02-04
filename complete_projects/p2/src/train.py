@@ -4,15 +4,14 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 
 # other libraries
-import os
 from tqdm.auto import tqdm
-from typing import Dict, Union, Literal
 
 # own modules
 from src.models import CNNModel
 from src.utils import (
     load_imagenette_data,
     Accuracy,
+    save_model,
     set_seed,
 )
 
@@ -65,7 +64,7 @@ def main() -> None:
     accuracy: Accuracy = Accuracy()
 
     # define progress bar
-    progress_bar = tqdm(range(epochs * (len(train_data) + len(val_data))))
+    progress_bar: tqdm = tqdm(range(epochs * (len(train_data) + len(val_data))))
 
     # epochs loop
     for epoch in range(epochs):
@@ -129,9 +128,7 @@ def main() -> None:
             writer.add_scalar("accuracy/val", accuracy.compute(), epoch)
 
     # save model
-    if not os.path.exists(f"models"):
-        os.makedirs(f"models")
-    torch.save(model, f"models/{name}.pt")
+    save_model(model, name)
 
 
 if __name__ == "__main__":
