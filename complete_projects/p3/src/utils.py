@@ -1,194 +1,101 @@
 # deep learning libraries
 import torch
 import numpy as np
-from torch.utils.data import Dataset, DataLoader, random_split
-from torchvision import transforms
+import torch.nn.functional as F
 from torch.jit import RecursiveScriptModule
 
 # other libraries
 import os
 import random
-import requests
-import tarfile
-import shutil
-from requests.models import Response
-from tarfile import TarFile
-from PIL import Image
+from typing import Optional
 
 
-class ImagenetteDataset(Dataset):
+class StepLR(torch.optim.lr_scheduler.LRScheduler):
     """
-    This class is the Imagenette Dataset.
+    This
+
+    Attr:
+        optimizer: optimizer that the scheduler is using.
+        step_size: number of steps to decrease learning rate.
+        gamma: factor to decrease learning rate.
+        last_epoch:
+        count: count of steps.
     """
 
-    def __init__(self, path: str) -> None:
+    optimizer: torch.optim.Optimizer
+    step_size: int
+    gamma: float
+    last_epoch: int
+    counters: int
+
+    def __init__(
+        self,
+        optimizer: torch.optim.Optimizer,
+        step_size: int,
+        gamma: float = 0.1,
+        last_epoch: int = -1,
+    ) -> None:
         """
-        Constructor of ImagenetteDataset.
+        This method is the constructor of StepLR class.
 
         Args:
-            path: path of the dataset.
+            optimizer: _description_
+            step_size: _description_
+            gamma: _description_. Defaults to 0.1.
+            last_epoch: _description_. Defaults to -1.
         """
 
-        # set attributes
-        self.path = path
-        self.names = os.listdir(path)
+        self.optimizer = optimizer
+        self.step_size = step_size
+        self.gamma = gamma
+        self.last_epoch = last_epoch
+        self.count = last_epoch + 1
 
-    def __len__(self) -> int:
-        """
-        This method returns the length of the dataset.
+    def step(self, epoch: Optional[int] = None) -> None:
+        # increment count
+        self.count += 1
 
-        Returns:
-            length of dataset.
-        """
+        # decrease lr if count reaches step dize
+        if self.count == self.step_size:
+            # decrease lr
+            self.optimizer.param_groups[0]["lr"] *= self.gamma
 
-        return len(self.names)
+            # reset count
+            self.count = 0
 
-    def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
-        """
-        This method loads an item based on the index.
-
-        Args:
-            index: index of the element in the dataset.
-
-        Returns:
-            tuple with image and label. Image dimensions:
-                [channels, height, width].
-        """
-
-        # load image path and label
-        image_path: str = f"{self.path}/{self.names[index]}"
-        label: int = int(self.names[index].split("_")[0])
-
-        # load image
-        transformations = transforms.Compose([transforms.ToTensor()])
-        image = Image.open(image_path)
-        image = transformations(image)
-
-        return image, label
+        return None
 
 
-def load_imagenette_data(
-    path: str, batch_size: int = 128, num_workers: int = 0
-) -> tuple[DataLoader, DataLoader, DataLoader]:
+def get_dropout_random_indexes(shape: torch.Size, p: float) -> torch.Tensor:
     """
-    This function returns two Dataloaders, one for train data and
-    other for validation data for imagenette dataset.
+    This function get the indexes to put elements at zero for the
+    dropout layer. It ensures the elements are selected following the
+    same implementation than the pytorch layer.
 
     Args:
-        path: path of the dataset.
-        color_space: color_space for loading the images.
-        batch_size: batch size for dataloaders. Default value: 128.and
-        num_workers: number of workers for loading data.
-            Default value: 0.
+        shape: shape of the inputs to put it at zero. Dimensions: [*].
+        p: probability of the dropout.
 
     Returns:
-        tuple of dataloaders, train, val and test in respective order.
+        indexes to put elements at zero in dropout layer.
+            Dimensions: shape.
     """
 
-    # download folders if they are not present
-    if not os.path.isdir(f"{path}"):
-        # create main dir
-        os.makedirs(f"{path}")
+    # get inputs indexes
+    inputs: torch.Tensor = torch.ones(shape)
 
-        # download data
-        download_data(path)
+    # get indexes
+    indexes: torch.Tensor = F.dropout(inputs, p)
+    indexes = (indexes == 0).int()
 
-    # create datasets
-    train_dataset: Dataset = ImagenetteDataset(f"{path}/train")
-    val_dataset: Dataset
-    train_dataset, val_dataset = random_split(train_dataset, [0.8, 0.2])
-    test_dataset: Dataset = ImagenetteDataset(f"{path}/val")
-
-    # define dataloaders
-    train_dataloader: DataLoader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers
-    )
-    val_dataloader: DataLoader = DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers
-    )
-    test_dataloader: DataLoader = DataLoader(
-        test_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers
-    )
-
-    return train_dataloader, val_dataloader, test_dataloader
-
-
-def download_data(path: str) -> None:
-    """
-    This function downloads the data from internet.
-
-    Args:
-        path: path to dave the data.
-    """
-
-    # define paths
-    url: str = "https://s3.amazonaws.com/fast-ai-imageclas/imagenette2.tgz"
-    target_path: str = f"{path}/imagenette2.tgz"
-
-    # download tar file
-    response: Response = requests.get(url, stream=True)
-    if response.status_code == 200:
-        with open(target_path, "wb") as f:
-            f.write(response.raw.read())
-
-    # extract tar file
-    tar_file: TarFile = tarfile.open(target_path)
-    tar_file.extractall(path)
-    tar_file.close()
-
-    # create final save directories
-    os.makedirs(f"{path}/train")
-    os.makedirs(f"{path}/val")
-
-    # define resize transformation
-    transform = transforms.Resize((224, 224))
-
-    # loop for saving processed data
-    list_splits: tuple[str, str] = ("train", "val")
-    for i in range(len(list_splits)):
-        list_class_dirs = os.listdir(f"{path}/imagenette2/{list_splits[i]}")
-        for j in range(len(list_class_dirs)):
-            list_dirs = os.listdir(
-                f"{path}/imagenette2/{list_splits[i]}/{list_class_dirs[j]}"
-            )
-            for k in range(len(list_dirs)):
-                image = Image.open(
-                    f"{path}/imagenette2/{list_splits[i]}/"
-                    f"{list_class_dirs[j]}/{list_dirs[k]}"
-                )
-                image = transform(image)
-                if image.im.bands == 3:
-                    image.save(f"{path}/{list_splits[i]}/{j}_{k}.jpg")
-
-    # delete other files
-    os.remove(target_path)
-    shutil.rmtree(f"{path}/imagenette2")
-
-    return None
-
-
-@torch.no_grad()
-def parameters_to_double(model: torch.nn.Module) -> None:
-    """
-    This function transforms the model parameters to double.
-
-    Args:
-        model: pytorch model.
-    """
-
-    # iterate over model parameters
-    parameter: torch.Tensor
-    for parameter in model.parameters():
-        parameter.data = parameter.data.double()
-
-    return None
+    return indexes
 
 
 class Accuracy:
     """
     This class is the accuracy object.
 
-    Attributes:
+    Attr:
         correct: number of correct predictions.
         total: number of total examples to classify.
     """

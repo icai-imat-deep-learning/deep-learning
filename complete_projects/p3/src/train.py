@@ -8,8 +8,8 @@ from tqdm.auto import tqdm
 
 # own modules
 from src.models import CNNModel
+from src.data import load_data
 from src.utils import (
-    load_imagenette_data,
     Accuracy,
     save_model,
     set_seed,
@@ -45,9 +45,7 @@ def main() -> None:
     # check device
     print(f"device: {device}")
 
-    train_data, val_data, _ = load_imagenette_data(
-        DATA_PATH, batch_size=128, num_workers=4
-    )
+    train_data, val_data, _ = load_data(DATA_PATH, batch_size=128, num_workers=4)
 
     # define model name and tensorboard writer
     name = f"model_lr_{lr}_e_{epochs}"

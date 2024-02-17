@@ -2,414 +2,67 @@
 import torch
 import torch.nn.functional as F
 
-# other libraries
-import math
-from typing import Any
+# own modules
+from src.utils import get_dropout_random_indexes
 
 
-class ReLUFunction(torch.autograd.Function):
+class Dropout(torch.nn.Module):
     """
-    Class for the implementation of the forward and backward pass of
-    the ReLU.
+    This the Dropout class.
+
+    Attr:
+        p: probability of the dropout.
+        inplace: indicates if the operation is done in-place.
+            Defaults to False.
     """
 
-    @staticmethod
-    def forward(ctx: Any, inputs: torch.Tensor) -> torch.Tensor:
+    def __init__(self, p: float, inplace: bool = False) -> None:
         """
-        This is the forward method of the relu.
+        This function is the constructor of the Dropout class.
 
         Args:
-            ctx: context for saving elements for the backward.
-            inputs: input tensor. Dimensions: [*].
-
-        Returns:
-            outputs tensor. Dimensions: [*], same as inputs.
+            p: probability of the dropout.
+            inplace: if the operation is done in place.
+                Defaults to False.
         """
 
-        # save tensors for the backward
-        ctx.save_for_backward(inputs)
-
-        # compute forward
-        outputs = inputs.clone()
-        outputs[outputs <= 0] = 0
-
-        return outputs
-
-    @staticmethod
-    def backward(ctx: Any, grad_output: torch.Tensor) -> torch.Tensor:  # type: ignore
-        """
-        This method is the backward of the relu.
-
-        Args:
-            ctx: context for loading elements from the forward.
-            grad_output: outputs gradients. Dimensions: [*].
-
-        Returns:
-            inputs gradients. Dimensions: [*], same as the grad_output.
-        """
-
-        # load tensors from the forward
-        (inputs,) = ctx.saved_tensors
-
-        # compute gradients
-        grad_input: torch.Tensor = torch.ones_like(inputs)
-        grad_input[inputs <= 0] = 0
-        grad_input *= grad_output
-
-        return grad_input
-
-
-class ReLU(torch.nn.Module):
-    """
-    This is the class that represents the ReLU Layer.
-    """
-
-    def __init__(self):
-        """
-        This method is the constructor of the ReLU layer.
-        """
-
-        # call super class constructor
         super().__init__()
-
-        self.fn = ReLUFunction.apply
+        self.p: float = p
+        self.inplace: bool = inplace
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        This is the forward pass for the class.
+        This method computes the forwward pass.
 
         Args:
             inputs: inputs tensor. Dimensions: [*].
 
         Returns:
-            outputs tensor. Dimensions: [*] (same as the input).
+            outputs. Dimensions: [*], same as inputs tensor.
         """
 
-        return self.fn(inputs)
+        # get activated neurons
+        dropout_indexes: torch.Tensor = get_dropout_random_indexes(inputs.shape, self.p)
+
+        # define outputs depending on inplace
+        if self.inplace:
+            outputs = inputs
+        else:
+            outputs = inputs.clone()
+
+        # filter neurons
+        outputs[dropout_indexes == 1] = 0
+
+        # scale by factor during training
+        if self.training:
+            outputs /= 1 - self.p
+
+        return outputs
 
 
-class LinearFunction(torch.autograd.Function):
-    """
-    This class implements the forward and backward of the Linear layer.
-    """
-
-    @staticmethod
-    def forward(
-        ctx: Any, inputs: torch.Tensor, weight: torch.Tensor, bias: torch.Tensor
-    ) -> torch.Tensor:
-        """
-        This method is the forward pass of the Linear layer.
-
-        Args:
-            ctx: contex for saving elements for the backward.
-            inputs: inputs tensor. Dimensions:
-                [batch, input dimension].
-            weight: weights tensor.
-                Dimensions: [output dimension, input dimension].
-            bias: bias tensor. Dimensions: [output dimension].
-
-        Returns:
-            outputs tensor. Dimensions: [batch, output dimension].
-        """
-
-        # save elements for backward
-        ctx.save_for_backward(inputs, weight, bias)
-
-        return torch.matmul(inputs, weight.T) + bias.unsqueeze(0)
-
-    @staticmethod
-    def backward(  # type: ignore
-        ctx: Any, grad_output: torch.Tensor
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """
-        This method is the backward for the Linear layer.
-
-        Args:
-            ctx: context for loading elements from the forward.
-            grad_output: outputs gradients.
-                Dimensions: [batch, output dimension].
-
-        Returns:
-            tuple of gradients, gradients of the inputs, the weights
-                and the bias, in respective order.
-                Inputs gradients dimension: [batch, input dimension].
-                Weights gradients dimension:
-                [output dimension, input dimension].
-                Bias gradients dimension: [output dimension].
-        """
-
-        # load elements from forward
-        inputs, weight, bias = ctx.saved_tensors
-
-        # compute gradients
-        grad_inputs = torch.matmul(grad_output, weight)
-        grad_weight = torch.matmul(inputs.T, grad_output).T
-        grad_bias = torch.matmul(
-            torch.ones_like(inputs[:, 0]).unsqueeze(0), grad_output
-        ).squeeze(0)
-
-        return grad_inputs, grad_weight, grad_bias
-
-
-class Linear(torch.nn.Module):
-    """
-    This is the class that represents the Linear Layer.
-    """
-
-    def __init__(self, input_dim: int, output_dim: int) -> None:
-        """
-        This method is the constructor of the Linear layer.
-        The attributes must be named the same as the parameters of the
-        linear layer in pytorch. The parameters should be initialized
-
-        Args:
-            input_dim: input dimension.
-            output_dim: output dimension.
-        """
-
-        # call super class constructor
-        super().__init__()
-
-        # define attributes
-        self.weight: torch.nn.Parameter = torch.nn.Parameter(
-            torch.empty(output_dim, input_dim)
-        )
-        self.bias: torch.nn.Parameter = torch.nn.Parameter(torch.empty(output_dim))
-
-        # init parameters corectly
-        self.reset_parameters()
-
-        # define layer function
-        self.fn = LinearFunction.apply
-
-        return None
-
-    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        """
-        This method if the forward pass of the layer.
-
-        Args:
-            inputs: inputs tensor. Dimenions: [batch, input dim].
-
-        Returns:
-            outputs tensor. Dimensions: [batch, output dim].
-        """
-
-        return self.fn(inputs, self.weight, self.bias)
-
-    def reset_parameters(self) -> None:
-        """
-        This method initializes the parameters in the correct way.
-        """
-
-        # init parameters the correct way
-        torch.nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
-        if self.bias is not None:
-            fan_in, _ = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
-            bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
-            torch.nn.init.uniform_(self.bias, -bound, bound)
-
-        return None
-
-
-class Conv2dFunction(torch.autograd.Function):
-    """
-    Class to implement the forward and backward methods of the Conv2d
-    layer.
-    """
-
-    @staticmethod
-    def forward(
-        ctx,
-        inputs: torch.Tensor,
-        weight: torch.Tensor,
-        bias: torch.Tensor,
-        padding: int,
-        stride: int,
-    ) -> torch.Tensor:
-        """
-        This function is the forward method of the class.
-
-        Args:
-            ctx: context for saving elements for the backward.
-            inputs: inputs for the model. Dimensions: [batch,
-                input channels, height, width].
-            weight: weight of the layer.
-                Dimensions: [output channels, input channels,
-                kernel size, kernel size].
-            bias: bias of the layer. Dimensions: [output channels].
-
-        Returns:
-            output of the layer. Dimensions:
-                [batch, output channels,
-                (height + 2*padding - kernel size) / stride + 1,
-                (width + 2*padding - kernel size) / stride + 1]
-        """
-
-        # save elements for the backward
-        ctx.save_for_backward(
-            inputs, weight, bias, torch.tensor(padding), torch.tensor(stride)
-        )
-
-        # unfold inputs and compute outputs
-        inputs_unfolded: torch.Tensor = F.unfold(
-            inputs, weight.shape[2], padding=padding, stride=stride
-        )
-        outputs_unfolded: torch.Tensor = torch.matmul(
-            inputs_unfolded.transpose(1, 2),
-            weight.view(weight.size(0), -1).t().unsqueeze(0),
-        ).transpose(1, 2)
-
-        # compute fold outputs
-        output_width_height: int = inputs.shape[2] - weight.shape[2] + 1
-        outputs: torch.Tensor = F.fold(
-            outputs_unfolded, output_width_height, 1, padding=padding, stride=stride
-        )
-
-        return outputs + bias.view(1, bias.shape[0], 1, 1)
-
-    @staticmethod
-    def backward(  # type: ignore
-        ctx, grad_output: torch.Tensor
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, None, None]:
-        """
-        This is the backward of the layer.
-
-        Args:
-            ctx: contex for loading elements needed in the backward.
-            grad_output: outputs gradients. Dimensions:
-                [batch, output channels,
-                (height + 2*padding - kernel size) / stride + 1,
-                (width + 2*padding - kernel size) / stride + 1]
-
-        Returns:
-            tuple of gradients of inputs, weights, bias and two None
-                values (you should not return a gradient for padding
-                and stride).
-                Inputs gradients dimensions: [batch, input channels,
-                height, width].
-                Weights gradients dimensions: [output channels,
-                input channels, kernel size, kernel size].
-                Bias gradients dimensions: [output channels].
-        """
-
-        # load saved tensors
-        inputs, weight, bias, padding, stride = ctx.saved_tensors
-        padding = padding.item()
-        stride = stride.item()
-
-        # compute unfolded versions
-        inputs_unfolded: torch.Tensor = F.unfold(
-            inputs, weight.shape[2], padding=padding, stride=stride
-        )
-        grad_output_unfolded: torch.Tensor = F.unfold(
-            grad_output, 1, padding=padding, stride=stride
-        )
-        weights_unfolded: torch.Tensor = (
-            weight.view(weight.size(0), -1).t().unsqueeze(0)
-        )
-
-        # compute inputs grad
-        grad_inputs_unfolded: torch.Tensor = torch.matmul(
-            weights_unfolded, grad_output_unfolded
-        )
-        grad_inputs: torch.Tensor = F.fold(
-            grad_inputs_unfolded,
-            inputs.shape[2],
-            weight.shape[2],
-            padding=padding,
-            stride=stride,
-        )
-
-        # compute weights grad
-        grad_weight: torch.Tensor = torch.matmul(
-            inputs_unfolded, grad_output_unfolded.transpose(1, 2)
-        )
-        grad_weight = grad_weight.view(
-            grad_weight.shape[0],
-            weight.shape[1],
-            weight.shape[2],
-            weight.shape[3],
-            grad_weight.shape[-1],
-        )
-        grad_weight = grad_weight.permute(0, 4, 1, 2, 3).sum(0)
-
-        # compute bias grad
-        grad_bias = torch.sum(torch.ones_like(grad_output) * grad_output, dim=(0, 2, 3))
-
-        return grad_inputs, grad_weight, grad_bias, None, None
-
-
-class Conv2d(torch.nn.Module):
-    """
-    This is the class that represents the Linear Layer.
-    """
-
-    def __init__(
-        self,
-        input_channels: int,
-        output_channels: int,
-        kernel_size: int,
-        padding: int = 0,
-        stride: int = 1,
-    ) -> None:
-        """
-        This method is the constructor of the Linear layer. Follow the
-        pytorch convention.
-
-        Args:
-            input_channels: input dimension.
-            output_channels: output dimension.
-            kernel_size: kernel size to use in the convolution.
-        """
-
-        # call super class constructor
-        super().__init__()
-
-        # define attributes
-        self.weight: torch.nn.Parameter = torch.nn.Parameter(
-            torch.empty(output_channels, input_channels, kernel_size, kernel_size)
-        )
-        self.bias: torch.nn.Parameter = torch.nn.Parameter(torch.empty(output_channels))
-        self.padding = padding
-        self.stride = stride
-
-        # init parameters corectly
-        self.reset_parameters()
-
-        # define layer function
-        self.fn = Conv2dFunction.apply
-
-        return None
-
-    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        """
-        This method if the forward pass of the layer.
-
-        Args:
-            inputs: inputs tensor. Dimensions: [batch, input channels,
-                output channels, height, width].
-
-        Returns:
-            outputs tensor. Dimensions: [batch, output channels,
-                height - kernel size + 1, width - kernel size + 1].
-        """
-
-        return self.fn(inputs, self.weight, self.bias, self.padding, self.stride)
-
-    def reset_parameters(self) -> None:
-        """
-        This method initializes the parameters in the correct way.
-        """
-
-        # init parameters the correct way
-        torch.nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
-        if self.bias is not None:
-            fan_in, _ = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
-            bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
-            torch.nn.init.uniform_(self.bias, -bound, bound)
-
-        return None
+class BatchNorm(torch.nn.Module):
+    # TODO: implement
+    pass
 
 
 class Block(torch.nn.Module):
