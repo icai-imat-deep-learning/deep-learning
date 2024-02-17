@@ -29,9 +29,7 @@ class ImagenetteDataset(Dataset):
             path: path of the dataset.
         """
 
-        # set attributes
-        self.path = path
-        self.names = os.listdir(path)
+        # TODO
 
     def __len__(self) -> int:
         """
@@ -41,7 +39,7 @@ class ImagenetteDataset(Dataset):
             length of dataset.
         """
 
-        return len(self.names)
+        # TODO
 
     def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
         """
@@ -55,16 +53,7 @@ class ImagenetteDataset(Dataset):
                 [channels, height, width].
         """
 
-        # load image path and label
-        image_path: str = f"{self.path}/{self.names[index]}"
-        label: int = int(self.names[index].split("_")[0])
-
-        # load image
-        transformations = transforms.Compose([transforms.ToTensor()])
-        image = Image.open(image_path)
-        image = transformations(image)
-
-        return image, label
+        # TODO
 
 
 def load_imagenette_data(
@@ -176,12 +165,7 @@ def parameters_to_double(model: torch.nn.Module) -> None:
         model: pytorch model.
     """
 
-    # iterate over model parameters
-    parameter: torch.Tensor
-    for parameter in model.parameters():
-        parameter.data = parameter.data.double()
-
-    return None
+    # TODO
 
 
 class Accuracy:

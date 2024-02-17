@@ -64,7 +64,7 @@ def val_step(
     # TODO
 
 
-def test_step(
+def t_step(
     model: torch.nn.Module,
     test_data: DataLoader,
     device: torch.device,

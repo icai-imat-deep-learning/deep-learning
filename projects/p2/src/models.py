@@ -26,14 +26,7 @@ class ReLUFunction(torch.autograd.Function):
             outputs tensor. Dimensions: [*], same as inputs.
         """
 
-        # save tensors for the backward
-        ctx.save_for_backward(inputs)
-
-        # compute forward
-        outputs = inputs.clone()
-        outputs[outputs <= 0] = 0
-
-        return outputs
+        # TODO
 
     @staticmethod
     def backward(ctx: Any, grad_output: torch.Tensor) -> torch.Tensor:  # type: ignore
@@ -48,15 +41,7 @@ class ReLUFunction(torch.autograd.Function):
             inputs gradients. Dimensions: [*], same as the grad_output.
         """
 
-        # load tensors from the forward
-        (inputs,) = ctx.saved_tensors
-
-        # compute gradients
-        grad_input: torch.Tensor = torch.ones_like(inputs)
-        grad_input[inputs <= 0] = 0
-        grad_input *= grad_output
-
-        return grad_input
+        # TODO
 
 
 class ReLU(torch.nn.Module):
@@ -112,10 +97,7 @@ class LinearFunction(torch.autograd.Function):
             outputs tensor. Dimensions: [batch, output dimension].
         """
 
-        # save elements for backward
-        ctx.save_for_backward(inputs, weight, bias)
-
-        return torch.matmul(inputs, weight.T) + bias.unsqueeze(0)
+        # TODO
 
     @staticmethod
     def backward(  # type: ignore
@@ -138,17 +120,7 @@ class LinearFunction(torch.autograd.Function):
                 Bias gradients dimension: [output dimension].
         """
 
-        # load elements from forward
-        inputs, weight, bias = ctx.saved_tensors
-
-        # compute gradients
-        grad_inputs = torch.matmul(grad_output, weight)
-        grad_weight = torch.matmul(inputs.T, grad_output).T
-        grad_bias = torch.matmul(
-            torch.ones_like(inputs[:, 0]).unsqueeze(0), grad_output
-        ).squeeze(0)
-
-        return grad_inputs, grad_weight, grad_bias
+        # TODO
 
 
 class Linear(torch.nn.Module):
@@ -246,27 +218,7 @@ class Conv2dFunction(torch.autograd.Function):
                 (width + 2*padding - kernel size) / stride + 1]
         """
 
-        # save elements for the backward
-        ctx.save_for_backward(
-            inputs, weight, bias, torch.tensor(padding), torch.tensor(stride)
-        )
-
-        # unfold inputs and compute outputs
-        inputs_unfolded: torch.Tensor = F.unfold(
-            inputs, weight.shape[2], padding=padding, stride=stride
-        )
-        outputs_unfolded: torch.Tensor = torch.matmul(
-            inputs_unfolded.transpose(1, 2),
-            weight.view(weight.size(0), -1).t().unsqueeze(0),
-        ).transpose(1, 2)
-
-        # compute fold outputs
-        output_width_height: int = inputs.shape[2] - weight.shape[2] + 1
-        outputs: torch.Tensor = F.fold(
-            outputs_unfolded, output_width_height, 1, padding=padding, stride=stride
-        )
-
-        return outputs + bias.view(1, bias.shape[0], 1, 1)
+        # TODO
 
     @staticmethod
     def backward(  # type: ignore
@@ -293,51 +245,7 @@ class Conv2dFunction(torch.autograd.Function):
                 Bias gradients dimensions: [output channels].
         """
 
-        # load saved tensors
-        inputs, weight, bias, padding, stride = ctx.saved_tensors
-        padding = padding.item()
-        stride = stride.item()
-
-        # compute unfolded versions
-        inputs_unfolded: torch.Tensor = F.unfold(
-            inputs, weight.shape[2], padding=padding, stride=stride
-        )
-        grad_output_unfolded: torch.Tensor = F.unfold(
-            grad_output, 1, padding=padding, stride=stride
-        )
-        weights_unfolded: torch.Tensor = (
-            weight.view(weight.size(0), -1).t().unsqueeze(0)
-        )
-
-        # compute inputs grad
-        grad_inputs_unfolded: torch.Tensor = torch.matmul(
-            weights_unfolded, grad_output_unfolded
-        )
-        grad_inputs: torch.Tensor = F.fold(
-            grad_inputs_unfolded,
-            inputs.shape[2],
-            weight.shape[2],
-            padding=padding,
-            stride=stride,
-        )
-
-        # compute weights grad
-        grad_weight: torch.Tensor = torch.matmul(
-            inputs_unfolded, grad_output_unfolded.transpose(1, 2)
-        )
-        grad_weight = grad_weight.view(
-            grad_weight.shape[0],
-            weight.shape[1],
-            weight.shape[2],
-            weight.shape[3],
-            grad_weight.shape[-1],
-        )
-        grad_weight = grad_weight.permute(0, 4, 1, 2, 3).sum(0)
-
-        # compute bias grad
-        grad_bias = torch.sum(torch.ones_like(grad_output) * grad_output, dim=(0, 2, 3))
-
-        return grad_inputs, grad_weight, grad_bias, None, None
+        # TODO
 
 
 class Conv2d(torch.nn.Module):
@@ -435,24 +343,7 @@ class Block(torch.nn.Module):
                 Block.
         """
 
-        # call torch.nn.Module constructor
-        super().__init__()
-
-        # fill network
-        self.net = torch.nn.Sequential(
-            torch.nn.Conv2d(input_channels, output_channels, kernel_size=3, padding=1),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(
-                output_channels,
-                output_channels,
-                kernel_size=3,
-                padding=1,
-                stride=stride,
-            ),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(output_channels, output_channels, kernel_size=3, padding=1),
-            torch.nn.ReLU(),
-        )
+        # TODO
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -467,7 +358,7 @@ class Block(torch.nn.Module):
                 (height - 1)/stride + 1, (width - 1)/stride + 1].
         """
 
-        return self.net(inputs)
+        # TODO
 
 
 class CNNModel(torch.nn.Module):
@@ -489,29 +380,7 @@ class CNNModel(torch.nn.Module):
             input_channels: input channels of the model.
         """
 
-        # call torch.nn.Module constructor
-        super().__init__()
-
-        # initialize module_list with a conv of kernel 7 a ReLU and a
-        # max pooling of kernel 3
-        module_list = [
-            torch.nn.Conv2d(input_channels, 32, kernel_size=7, padding=3, stride=2),
-            torch.nn.ReLU(),
-            torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
-        ]
-
-        # add 3 Blocks to module_list
-        last_layer = 32
-        for layer in hidden_sizes:
-            module_list.append(Block(last_layer, layer, stride=2))
-            last_layer = layer
-        self.cnn_net = torch.nn.Sequential(*module_list)
-
-        # define GAP
-        self.gap = torch.nn.AdaptiveAvgPool2d((1, 1))
-
-        # add a final linear layer for classification
-        self.classifier = torch.nn.Linear(last_layer, output_channels)
+        # TODO
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -526,14 +395,4 @@ class CNNModel(torch.nn.Module):
             batch of logits. Dimensions: [batch, output_channels].
         """
 
-        # compute the features
-        outputs = self.cnn_net(inputs)
-
-        # GAP
-        outputs = self.gap(outputs)
-
-        # flatten output and compute linear layer output
-        outputs = torch.flatten(outputs, 1)
-        outputs = self.classifier(outputs)
-
-        return outputs
+        # TODO
