@@ -22,7 +22,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 def main() -> None:
     """
-    This function is the main program
+    This function is the main program.
     """
 
     # load data
