@@ -91,6 +91,23 @@ def get_dropout_random_indexes(shape: torch.Size, p: float) -> torch.Tensor:
     return indexes
 
 
+@torch.no_grad()
+def parameters_to_double(model: torch.nn.Module) -> None:
+    """
+    This function transforms the model parameters to double.
+
+    Args:
+        model: pytorch model.
+    """
+
+    # iterate over model parameters
+    parameter: torch.Tensor
+    for parameter in model.parameters():
+        parameter.data = parameter.data.double()
+
+    return None
+
+
 class Accuracy:
     """
     This class is the accuracy object.

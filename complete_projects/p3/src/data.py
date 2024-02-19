@@ -1,13 +1,10 @@
 # deep learning libraries
 import torch
-import numpy as np
 from torch.utils.data import Dataset, DataLoader, random_split
 from torchvision import transforms
-from torch.jit import RecursiveScriptModule
 
 # other libraries
 import os
-import random
 import requests
 import tarfile
 import shutil
