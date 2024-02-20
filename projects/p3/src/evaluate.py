@@ -1,17 +1,12 @@
 # deep learning libraries
 import torch
-import numpy as np
-from torch.utils.tensorboard import SummaryWriter
-
-# other libraries
-from tqdm.auto import tqdm
+from torch.jit import RecursiveScriptModule
 
 # own modules
-from src.models import CNNModel
 from src.data import load_data
 from src.utils import (
     Accuracy,
-    save_model,
+    load_model,
     set_seed,
 )
 
@@ -27,16 +22,14 @@ torch.set_num_threads(8)
 # static variables
 DATA_PATH: str = "data"
 
-NUMBER_OF_CLASSES: int = 10
 
-
-def main() -> None:
+def main(name: str) -> float:
     """
-    This function is the main program for the training.
+    This function is the main program for the testing.
     """
 
     # TODO
 
 
 if __name__ == "__main__":
-    main()
+    print(f"accuracy: {main('best_model')}")

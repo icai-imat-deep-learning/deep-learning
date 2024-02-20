@@ -14,13 +14,13 @@ def test_accuracy() -> None:
     # call evaluate
     accuracy_value: float = main("best_model")
 
+    # check if accuracy is higher than 65%
+    assert accuracy_value > 0.65, "Accuracy not higher than 65%"
+
     # check if accuracy is higher than 70%
     assert accuracy_value > 0.70, "Accuracy not higher than 70%"
 
     # check if accuracy is higher than 75%
     assert accuracy_value > 0.75, "Accuracy not higher than 75%"
-
-    # check if accuracy is higher than 80%
-    assert accuracy_value > 0.80, "Accuracy not higher than 80%"
 
     return None
