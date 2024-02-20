@@ -3,8 +3,8 @@ import torch
 from torch.jit import RecursiveScriptModule
 
 # own modules
+from src.data import load_data
 from src.utils import (
-    load_imagenette_data,
     Accuracy,
     load_model,
     set_seed,
@@ -35,7 +35,7 @@ def main(name: str) -> float:
         _,
         _,
         test_data,
-    ) = load_imagenette_data(DATA_PATH, batch_size=128, num_workers=4)
+    ) = load_data(DATA_PATH, batch_size=128, num_workers=4)
 
     # define model
     model: RecursiveScriptModule = load_model(name).to(device)

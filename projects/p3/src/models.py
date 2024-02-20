@@ -25,9 +25,7 @@ class Dropout(torch.nn.Module):
                 Defaults to False.
         """
 
-        super().__init__()
-        self.p: float = p
-        self.inplace: bool = inplace
+        # TODO
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -40,24 +38,7 @@ class Dropout(torch.nn.Module):
             outputs. Dimensions: [*], same as inputs tensor.
         """
 
-        # get activated neurons
-        dropout_indexes: torch.Tensor = get_dropout_random_indexes(inputs.shape, self.p)
-
-        # define outputs depending on inplace
-        if self.inplace:
-            outputs = inputs
-        else:
-            outputs = inputs.clone()
-
-        if self.training:
-            # filter neurons
-            outputs[dropout_indexes == 1] = 0
-
-            # scale by factor during training
-            if self.training:
-                outputs /= 1 - self.p
-
-        return outputs
+        # TODO
 
 
 class CNNModel(torch.nn.Module):

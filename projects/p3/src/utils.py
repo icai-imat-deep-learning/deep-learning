@@ -32,7 +32,6 @@ class StepLR(torch.optim.lr_scheduler.LRScheduler):
         optimizer: torch.optim.Optimizer,
         step_size: int,
         gamma: float = 0.1,
-        last_epoch: int = -1,
     ) -> None:
         """
         This method is the constructor of StepLR class.
@@ -43,11 +42,7 @@ class StepLR(torch.optim.lr_scheduler.LRScheduler):
             gamma: factor to change the lr. Defaults to 0.1.
         """
 
-        self.optimizer = optimizer
-        self.step_size = step_size
-        self.gamma = gamma
-        self.last_epoch = last_epoch
-        self.count = last_epoch + 1
+        # TODO
 
     def step(self, epoch: Optional[int] = None) -> None:
         """
@@ -57,18 +52,7 @@ class StepLR(torch.optim.lr_scheduler.LRScheduler):
             epoch: ignore this argument. Defaults to None.
         """
 
-        # increment count
-        self.count += 1
-
-        # decrease lr if count reaches step dize
-        if self.count == self.step_size:
-            # decrease lr
-            self.optimizer.param_groups[0]["lr"] *= self.gamma
-
-            # reset count
-            self.count = 0
-
-        return None
+        # TODO
 
 
 def get_dropout_random_indexes(shape: torch.Size, p: float) -> torch.Tensor:
