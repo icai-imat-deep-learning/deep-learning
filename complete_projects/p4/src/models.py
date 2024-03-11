@@ -3,7 +3,7 @@ import torch
 
 # other libraries
 import math
-from typing import Any, Optional
+from typing import Any
 
 
 class RNNFunction(torch.autograd.Function):
@@ -137,6 +137,12 @@ class RNNFunction(torch.autograd.Function):
         grad_input[:, -1, :] = torch.matmul(grad_hidden[:, -1, :], weight_ih)
         grad_weight_ih += torch.matmul(grad_hidden[:, -1, :].T, inputs[:, -1, :])
         grad_weight_hh += torch.matmul(grad_hidden[:, -1, :].T, hn[:, -2, :])
+        grad_bias_ih += torch.matmul(
+            torch.ones_like(inputs[:, 0, :]).T, grad_hidden[:, -1, :]
+        ).sum(0)
+        grad_bias_hh += torch.matmul(
+            torch.ones_like(hn[:, 0, :]).T, grad_hidden[:, -1, :]
+        ).sum(0)
 
         # get sequence length
         tau: int = inputs.shape[1]
@@ -151,6 +157,12 @@ class RNNFunction(torch.autograd.Function):
             grad_input[:, -t, :] = torch.matmul(grad_hidden[:, -t, :], weight_ih)
             grad_weight_ih += torch.matmul(grad_hidden[:, -t, :].T, inputs[:, -t, :])
             grad_weight_hh += torch.matmul(grad_hidden[:, -t, :].T, hn[:, -(t + 1), :])
+            grad_bias_ih += torch.matmul(
+                torch.ones_like(inputs[:, 0, :]).T, grad_hidden[:, -t, :]
+            ).sum(0)
+            grad_bias_hh += torch.matmul(
+                torch.ones_like(hn[:, 0, :]).T, grad_hidden[:, -t, :]
+            ).sum(0)
 
         # compute for first time stamp
         grad_hidden[:, -tau, :] = (
@@ -161,6 +173,12 @@ class RNNFunction(torch.autograd.Function):
         grad_input[:, -tau, :] = torch.matmul(grad_hidden[:, -tau, :], weight_ih)
         grad_weight_ih += torch.matmul(grad_hidden[:, -tau, :].T, inputs[:, -tau, :])
         grad_weight_hh += torch.matmul(grad_hidden[:, -tau, :].T, h0[0])
+        grad_bias_ih += torch.matmul(
+            torch.ones_like(inputs[:, 0, :]).T, grad_hidden[:, -tau, :]
+        ).sum(0)
+        grad_bias_hh += torch.matmul(
+            torch.ones_like(hn[:, 0, :]).T, grad_hidden[:, -tau, :]
+        ).sum(0)
 
         # compute h0
         grad_h0[0] = torch.matmul(grad_hidden[:, -(tau), :], weight_hh)
@@ -209,11 +227,15 @@ class RNN(torch.nn.Module):
         This is the forward pass for the class.
 
         Args:
-            inputs: inputs tensor. Dimensions: [*].
+            inputs: inputs tensor. Dimensions: [batch, sequence,
+                input size].
             h0: initial hidden state.
 
         Returns:
-            outputs tensor. Dimensions: [*] (same as the input).
+            outputs tensor. Dimensions: [batch, sequence,
+                hidden size].
+            final hidden state for each element in the batch.
+                Dimensions: [1, batch, hidden size].
         """
 
         return self.fn(
@@ -230,3 +252,53 @@ class RNN(torch.nn.Module):
             torch.nn.init.uniform_(weight, -stdv, stdv)
 
         return None
+
+
+class MyModel(torch.nn.Module):
+    def __init__(self, hidden_size: int) -> None:
+        """
+        This method is the constructor of the class.
+
+        Args:
+            hidden_size: hidden size of the RNN layers
+        """
+
+        # call super class constructor
+        super().__init__()
+
+        self.hidden_size = hidden_size
+
+        # define rnn
+        self.rnn = torch.nn.LSTM(
+            input_size=24, hidden_size=self.hidden_size, num_layers=2, batch_first=True
+        )
+
+        # define mlp
+        self.mlp = torch.nn.Sequential(
+            torch.nn.ReLU(), torch.nn.Linear(self.hidden_size, 24)
+        )
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        """
+        This method is the forward pass of the model.
+
+        Args:
+            inputs: inputs tensor. Dimensions: [batch, number of past days, 24].
+
+        Returns:
+            output tensor. Dimensions: [batch, 24].
+        """
+
+        # define inputs to rnn
+        h0: torch.Tensor = torch.zeros(2, inputs.size(0), self.hidden_size).to(
+            self.rnn.bias_hh_l0.device
+        )
+        c0: torch.Tensor = torch.zeros(2, inputs.size(0), self.hidden_size).to(
+            self.rnn.bias_hh_l0.device
+        )
+
+        # compute outputs
+        outputs, _ = self.rnn(inputs, (h0, c0))
+        outputs = self.mlp(outputs)
+
+        return outputs

@@ -17,12 +17,7 @@ def parameters_to_double(model: torch.nn.Module) -> None:
         model: pytorch model.
     """
 
-    # iterate over model parameters
-    parameter: torch.Tensor
-    for parameter in model.parameters():
-        parameter.data = parameter.data.double()
-
-    return None
+    # TODO
 
 
 def save_model(model: torch.nn.Module, name: str) -> None:
