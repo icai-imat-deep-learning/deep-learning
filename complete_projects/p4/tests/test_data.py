@@ -81,15 +81,15 @@ def test_load_data() -> None:
         len(train_data) == 1155
     ), f"Incorrect length of training set, expected 1162 and got {len(train_data)}"
 
-    # check size of train_data
+    # check size of val_data
     assert (
         len(val_data) == 294
-    ), f"Incorrect length of training set, expected 1162 and got {len(train_data)}"
+    ), f"Incorrect length of training set, expected 1162 and got {len(val_data)}"
 
-    # check size of train_data
+    # check size of test_data
     assert (
         len(test_data) == 728
-    ), f"Incorrect length of training set, expected 1162 and got {len(train_data)}"
+    ), f"Incorrect length of training set, expected 1162 and got {len(test_data)}"
 
     # check mean
     assert (
