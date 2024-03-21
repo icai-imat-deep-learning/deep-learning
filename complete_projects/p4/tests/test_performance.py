@@ -17,7 +17,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 @pytest.mark.order(5)
 @pytest.mark.parametrize("data_path", ["data"])
-def test_accuracy(data_path: str) -> None:
+def test_mae(data_path: str) -> None:
     """
     This is the test for the accuracy in the test set.
     """
@@ -26,7 +26,7 @@ def test_accuracy(data_path: str) -> None:
     set_seed(42)
 
     test_data: DataLoader
-    _, _, test_data, mean, std = load_data(data_path, batch_size=64)
+    _, _, test_data, mean, std = load_data(data_path, batch_size=1)
 
     # define model
     model: RecursiveScriptModule = torch.jit.load("models/best_model.pt").to(device)
