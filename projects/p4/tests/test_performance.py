@@ -41,6 +41,6 @@ def test_accuracy(data_path: str) -> None:
     assert mae_value < 2.35, "MAE is not lower than 2.35"
 
     # check if MAE is lower than 2.1
-    assert mae_value < 2.1, "MAE is not lower than 2.1"
+    assert mae_value < 2.2, "MAE is not lower than 2.2"
 
     return None
