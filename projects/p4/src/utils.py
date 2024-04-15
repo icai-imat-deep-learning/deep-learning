@@ -1,34 +1,21 @@
 # deep learning libraries
 import torch
-import torchvision
 import numpy as np
-import pandas as pd
 from torch.jit import RecursiveScriptModule
-from torch.utils.data import Dataset, DataLoader, random_split
-from torchvision import transforms
 
 # other libraries
 import os
 import random
 
 
-def load_data(
-    path: str, batch_size: int = 128
-) -> tuple[DataLoader, DataLoader, DataLoader]:
+@torch.no_grad()
+def parameters_to_double(model: torch.nn.Module) -> None:
     """
-    This function loads the data from mnist dataset. All batches must
-    be equal size. The division between train and val must be 0.8-0.2.
+    This function transforms the model parameters to double.
 
     Args:
-        path: path to save the datasets.
-        batch_size: batch size. Defaults to 128.
-
-    Returns:
-        tuple of three dataloaders, train, val and test in respective order.
+        model: pytorch model.
     """
-
-    # define transforms
-    transformations = transforms.Compose([transforms.ToTensor()])
 
     # TODO
 
@@ -48,18 +35,35 @@ def save_model(model: torch.nn.Module, name: str) -> None:
         os.makedirs("models")
 
     # save scripted model
-    model_scripted = torch.jit.script(model.cpu())
+    model_scripted: RecursiveScriptModule = torch.jit.script(model.cpu())
     model_scripted.save(f"models/{name}.pt")
 
     return None
 
 
-def set_seed(seed: int) -> None:
+def load_model(name: str) -> RecursiveScriptModule:
     """
-    This function sets a seed and ensure a deterministic behavior
+    This function is to load a model from the 'models' folder.
 
     Args:
-        seed: seed number to fix radomness
+        name: name of the model to load.
+
+    Returns:
+        model in torchscript.
+    """
+
+    # define model
+    model: RecursiveScriptModule = torch.jit.load(f"models/{name}.pt")
+
+    return model
+
+
+def set_seed(seed: int) -> None:
+    """
+    This function sets a seed and ensure a deterministic behavior.
+
+    Args:
+        seed: seed number to fix radomness.
     """
 
     # set seed in numpy and random
@@ -80,19 +84,3 @@ def set_seed(seed: int) -> None:
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 
     return None
-
-
-def accuracy(predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
-    """
-    This function computes the accuracy.
-
-    Args:
-        predictions: predictions tensor. Dimensions:
-            [batch, num classes] or [batch].
-        targets: targets tensor. Dimensions: [batch, 1] or [batch].
-
-    Returns:
-        the accuracy in a tensor of a single element.
-    """
-
-    # TODO

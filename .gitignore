@@ -1,13 +1,10 @@
 # folders
-/data/
-/saved_objects/
-/runs/
-/models/
+data/
+runs/
+models/
 __pycache__/
 .vscode/
 .mypy_cache/
-/results/
-scalers/
 
 # files
 *.csv
@@ -18,3 +15,4 @@ scalers/
 *.pkl
 *.pt
 *.ini
+*.zip
