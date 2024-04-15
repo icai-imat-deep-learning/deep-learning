@@ -1,0 +1,71 @@
+Final Project groups
+Group 1 (4 people)
+ Jorge Gómez Azor
+ Ignacio Bayón Jiménez-Ugarte
+ Adrián López-Lanchares
+ Carlos Mazuecos Reíllo
+Final project:6. Adversarial attacks on NLP models
+
+Group 2 (4 people)
+ Mario Kroll Merino
+ Nicolás Villagrán Prieto
+ Daniel Sánchez Sánchez
+ Sergio Herreros Pérez
+Final project: 8. Audio to text
+
+Group 3 (4 people)
+ Natalia Leyenda Lodares
+ Miguel Montes Lorenzo  
+ Sofía Pedrós Tobaruela
+ Manuel Rodríguez Villegas
+Final project: 7. Syntax-aware classification
+
+Group 4 (4 people)
+ Daniela Blanco Del Real
+ Enrique Campos Alonso
+ Patricia Renart Carnicero
+ Joaquín Mir Macias
+Final project: 2. How to Properly Initialize RNNs
+
+Group 5 (4 people)
+ Adolfo Lozano Mendoza
+ Pablo Gómez Martínez
+ Mario Freire Arias
+ Antonio Lorenzo Díaz-Meco
+Final Project: 1. Explainability Applied to RNNs
+
+Group 6 (4 people)
+ Antonio Mora Abós 
+ Jaime Paz Rodríguez
+ Álvaro Pereira Chagoyen
+ Sergio Rodríguez Vidal
+Final project: 4. RNNs + SSM
+
+Group 7 (4 people)
+ Andrés Martínez Fuentes
+ Javier Ríos Montes
+ Lucía Prado Fernández-Vega
+ Pablo García Molina
+Final project: 10. Multi-modal sentiment analysis
+
+Group 8 (4 people)
+ Elena Ardura Carnicero
+ Pablo Díaz Vega
+ Victoria García Martínez-Echevarría
+ Jimena Monteagudo Ruiz
+ Final project: 3. Seq2Seq and Embedding-based Mini-Translators
+
+Group 9 (4 people)
+ María Jaque Oficialdegui
+ Emma Rey Sánchez
+ José Ridruejo Tuñón
+ Catalina Royo-Villanova Seguí
+Final project: 5. Image Captioning using CNN-RNN Architecture
+
+Group 10 (5 people)
+ Miguel Ara Adánez
+ Alejandro Martínez de Guinea García
+ Lara Ocón Madrid
+ Javier Prieto Domínguez
+ Javier Rojo Llorens
+Final project: 9. Computational efficiency with attention
