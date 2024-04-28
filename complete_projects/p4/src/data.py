@@ -74,7 +74,7 @@ def load_data(
     past_days: int = 7,
     batch_size: int = 64,
     shuffle: bool = True,
-    drop_last: bool = True,
+    drop_last: bool = False,
     num_workers: int = 0,
 ) -> tuple[DataLoader, DataLoader, DataLoader, float, float]:
     """
