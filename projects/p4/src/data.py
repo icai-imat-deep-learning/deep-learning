@@ -43,6 +43,7 @@ class ElectricDataset(Dataset):
         """
 
         # TODO
+
     def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
         """
         This method returns an element from the dataset based on the

@@ -169,17 +169,17 @@ class ResidualFunction(torch.autograd.Function):
 
         Args:
             ctx: context for loading elements from the forward.
-            grad_output: outputs gradients. 
+            grad_output: outputs gradients.
                 Dimensions: [batch, input dimension].
 
         Returns:
             inputs gradients. Dimension: [batch, input dimension].
-            weights gradients. 
+            weights gradients.
                 Dimension: [input dimension, input dimension].
             bias gradients. Dimension: [input dimension].
             a gradients. Dimension: [0].
         """
-        
+
         # load elements from forward
         inputs, weight, bias, a = ctx.saved_tensors
 
