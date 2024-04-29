@@ -57,14 +57,16 @@ class MaxoutFunction(torch.autograd.Function):
         ctx: Any, grad_output: torch.Tensor
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
-        This method is the backward of the maxout.
+        This method is the backward of the Maxout.
 
         Args:
             ctx: context for loading elements from the forward.
-            grad_output: outputs gradients. Dimensions: [*].
+            grad_output: outputs gradients. Dimensions:
+                [batch, output dim].
 
         Returns:
-            inputs gradients. Dimensions: [*], same as the grad_output.
+            inputs gradients. Dimensions: [batch, input dim].
+            gradients for the first weights. Dimensions: []
         """
 
         # load tensors from the forward
@@ -77,31 +79,29 @@ class MaxoutFunction(torch.autograd.Function):
             indexes,
         ) = ctx.saved_tensors
 
-        # compute input gradients
-        grad_inputs = torch.matmul(grad_output, weights_first)
-        grad_inputs[~indexes] = torch.matmul(grad_output, weights_second)[~indexes]
+        # compute grad outputs for each branch
+        grad_outputs_first: torch.Tensor = grad_output.clone()
+        grad_outputs_second: torch.Tensor = grad_output.clone()
+        grad_outputs_first[~indexes] = 0
+        grad_outputs_second[indexes] = 0
+
+        # compuye grad inputs
+        grad_inputs_first = torch.matmul(grad_outputs_first, weights_first)
+        grad_inputs_second = torch.matmul(grad_outputs_second, weights_second)
+        grad_inputs = grad_inputs_first + grad_inputs_second
 
         # compute weights and bias gradients
-        inputs_first: torch.Tensor = inputs.clone()
-        inputs_second: torch.Tensor = inputs.clone()
-        inputs_first[indexes] = 0
-        inputs_second[~indexes] = 0
-        grad_weight_first = torch.matmul(inputs_first.T, grad_output).T
-        grad_weight_second = torch.matmul(inputs_second.T, grad_output).T
+        grad_weight_first = torch.matmul(inputs.T, grad_outputs_first).T
+        grad_weight_second = torch.matmul(inputs.T, grad_outputs_second).T
         grad_bias_first = torch.matmul(
-            torch.ones_like(inputs_first[:, 0]).unsqueeze(0), grad_output
+            torch.ones_like(inputs[:, 0]).unsqueeze(0), grad_outputs_first
         ).squeeze(0)
         grad_bias_second = torch.matmul(
-            torch.ones_like(inputs_first[:, 0]).unsqueeze(0), grad_output
+            torch.ones_like(inputs[:, 0]).unsqueeze(0), grad_outputs_second
         ).squeeze(0)
 
-        # compute gradients
-        grad_input: torch.Tensor = torch.ones_like(inputs)
-        grad_input[inputs <= 0] = 0
-        grad_input *= grad_output
-
         return (
-            grad_input,
+            grad_inputs,
             grad_weight_first,
             grad_bias_first,
             grad_weight_second,
@@ -111,12 +111,12 @@ class MaxoutFunction(torch.autograd.Function):
 
 class Maxout(torch.nn.Module):
     """
-    This is the class that represents the ReLU Layer.
+    This is the class that represents the Maxout Layer.
     """
 
     def __init__(self, input_dim: int, output_dim: int) -> None:
         """
-        This method is the constructor of the ReLU layer.
+        This method is the constructor of the Maxout layer.
         """
 
         # call super class constructor
@@ -146,10 +146,10 @@ class Maxout(torch.nn.Module):
         This is the forward pass for the class.
 
         Args:
-            inputs: inputs tensor. Dimensions: [*].
+            inputs: inputs tensor. Dimensions: [batch, input dim].
 
         Returns:
-            outputs tensor. Dimensions: [*] (same as the input).
+            outputs tensor. Dimensions: [batch, output dim].
         """
 
         return self.fn(
@@ -169,16 +169,13 @@ class Maxout(torch.nn.Module):
         bias_second: torch.Tensor,
     ) -> None:
         """
-        _summary_
+        This function is to set the parameters of the model.
 
         Args:
-            weights_first: _description_
-            bias_first: _description_
-            weights_second: _description_
-            bias_second: _description_
-
-        Returns:
-            _description_
+            weights_first: weights for the first branch.
+            bias_first: bias for the first branch
+            weights_second: weights for the second branch.
+            bias_second: bias for the second branch.
         """
 
         # set attributes
