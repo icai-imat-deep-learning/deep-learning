@@ -23,11 +23,11 @@ This method is contained in the src.conv1d module. It is needed to complete the 
 
 This method is contained in the src.conv1d module. It is needed to complete the fold1d and unfold1d functions before. No nn functions are allowed.
 
-## Maxout forward (0.5 points)
+## Maxout forward (1 point)
 
 This method is contained in the src.maxout module. No nn functions are allowed.
 
-## Maxout backward (0.5 points)
+## Maxout backward (1 point)
 
 This method is contained in the src.maxout module. No nn functions are allowed.
 
