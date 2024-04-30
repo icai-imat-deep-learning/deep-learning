@@ -19,8 +19,7 @@ def test_nadam(
     lr: float, betas: tuple[float, float], weight_decay: float, momentum_decay: float
 ) -> None:
     """
-    This function is the test for the SGD algorithm with nesterov
-    momentum.
+    This function is the test for the NAdam algorithm.
 
     Args:
         lr: learning rate.

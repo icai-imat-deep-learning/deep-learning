@@ -55,6 +55,7 @@ def fold1d(
     Args:
         inputs: input tensor. Dimensions: [batch,
             output channels * kernel size, number of windows].
+        output_size: output sequence length.
         kernel_size: kernel size to use in the fold operation.
         dilation: dilation to use in the fold operation.
         stride: stride to use in the fold operation.
@@ -78,7 +79,7 @@ def fold1d(
 
 class Conv1dFunction(torch.autograd.Function):
     """
-    Class to implement the forward and backward methods of the Conv2d
+    Class to implement the forward and backward methods of the Conv1d
     layer.
     """
 
@@ -98,17 +99,17 @@ class Conv1dFunction(torch.autograd.Function):
         Args:
             ctx: context for saving elements for the backward.
             inputs: inputs for the model. Dimensions: [batch,
-                input channels, height, width].
+                input channels, sequence length].
             weight: weight of the layer.
                 Dimensions: [output channels, input channels,
-                kernel size, kernel size].
+                kernel size].
             bias: bias of the layer. Dimensions: [output channels].
 
         Returns:
             output of the layer. Dimensions:
                 [batch, output channels,
-                (height + 2*padding - kernel size) / stride + 1,
-                (width + 2*padding - kernel size) / stride + 1]
+                (sequence length + 2*padding - kernel size) /
+                stride + 1]
         """
 
         # save elements for the backward
@@ -154,18 +155,18 @@ class Conv1dFunction(torch.autograd.Function):
             ctx: contex for loading elements needed in the backward.
             grad_output: outputs gradients. Dimensions:
                 [batch, output channels,
-                (height + 2*padding - kernel size) / stride + 1,
-                (width + 2*padding - kernel size) / stride + 1]
+                (sequence length + 2*padding - kernel size) /
+                stride + 1]
 
         Returns:
-            tuple of gradients of inputs, weights, bias and two None
-                values (you should not return a gradient for padding
-                and stride).
-                Inputs gradients dimensions: [batch, input channels,
-                height, width].
-                Weights gradients dimensions: [output channels,
-                input channels, kernel size, kernel size].
-                Bias gradients dimensions: [output channels].
+            gradient of the inputs. Dimensions: [batch,
+                input channels, sequence length].
+            gradient of the weights. Dimensions: [output channels,
+                input channels, kernel size].
+            gradient of the bias. Dimensions: [output channels].
+            None.
+            None.
+            None.
         """
 
         # load saved tensors
@@ -266,11 +267,11 @@ class Conv1d(torch.nn.Module):
 
         Args:
             inputs: inputs tensor. Dimensions: [batch, input channels,
-                output channels, height, width].
+                output channels, sequence length].
 
         Returns:
             outputs tensor. Dimensions: [batch, output channels,
-                height - kernel size + 1, width - kernel size + 1].
+                sequence length - kernel size + 1].
         """
 
         return self.fn(

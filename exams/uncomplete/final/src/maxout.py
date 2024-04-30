@@ -26,31 +26,13 @@ class MaxoutFunction(torch.autograd.Function):
 
         Args:
             ctx: context for saving elements for the backward.
-            inputs: input tensor. Dimensions: [*].
+            inputs: input tensor. Dimensions: [batch, input dim].
 
         Returns:
-            outputs tensor. Dimensions: [*], same as inputs.
+            outputs tensor. Dimensions: [batch, output dim].
         """
 
-        # compute forward
-        outputs_first: torch.Tensor = torch.matmul(
-            inputs, weights_first.T
-        ) + bias_first.unsqueeze(0)
-        outputs_second: torch.Tensor = torch.matmul(
-            inputs, weights_second.T
-        ) + bias_second.unsqueeze(0)
-
-        # compute final outputs
-        outputs: torch.Tensor = outputs_second.clone()
-        indexes: torch.Tensor = outputs_second <= outputs_first
-        outputs[indexes] = outputs_first[indexes]
-
-        # save tensors for the backward
-        ctx.save_for_backward(
-            inputs, weights_first, bias_first, weights_second, bias_second, indexes
-        )
-
-        return outputs
+        # TODO
 
     @staticmethod
     def backward(  # type: ignore
@@ -66,47 +48,15 @@ class MaxoutFunction(torch.autograd.Function):
 
         Returns:
             inputs gradients. Dimensions: [batch, input dim].
-            gradients for the first weights. Dimensions: []
+            gradients for the first weights. Dimensions:
+                [output dim, input dim].
+            gradients for the first bias. Dimensions: [output dim].
+            gradient for the second weights. Dimensions: [output dim,
+                input dim].
+            gradient for the second bias. Dimensions: [output dim].
         """
 
-        # load tensors from the forward
-        (
-            inputs,
-            weights_first,
-            bias_first,
-            weights_second,
-            bias_second,
-            indexes,
-        ) = ctx.saved_tensors
-
-        # compute grad outputs for each branch
-        grad_outputs_first: torch.Tensor = grad_output.clone()
-        grad_outputs_second: torch.Tensor = grad_output.clone()
-        grad_outputs_first[~indexes] = 0
-        grad_outputs_second[indexes] = 0
-
-        # compuye grad inputs
-        grad_inputs_first = torch.matmul(grad_outputs_first, weights_first)
-        grad_inputs_second = torch.matmul(grad_outputs_second, weights_second)
-        grad_inputs = grad_inputs_first + grad_inputs_second
-
-        # compute weights and bias gradients
-        grad_weight_first = torch.matmul(inputs.T, grad_outputs_first).T
-        grad_weight_second = torch.matmul(inputs.T, grad_outputs_second).T
-        grad_bias_first = torch.matmul(
-            torch.ones_like(inputs[:, 0]).unsqueeze(0), grad_outputs_first
-        ).squeeze(0)
-        grad_bias_second = torch.matmul(
-            torch.ones_like(inputs[:, 0]).unsqueeze(0), grad_outputs_second
-        ).squeeze(0)
-
-        return (
-            grad_inputs,
-            grad_weight_first,
-            grad_bias_first,
-            grad_weight_second,
-            grad_bias_second,
-        )
+        # TODO
 
 
 class Maxout(torch.nn.Module):
@@ -173,7 +123,7 @@ class Maxout(torch.nn.Module):
 
         Args:
             weights_first: weights for the first branch.
-            bias_first: bias for the first branch
+            bias_first: bias for the first branch.
             weights_second: weights for the second branch.
             bias_second: bias for the second branch.
         """

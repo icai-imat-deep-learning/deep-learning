@@ -38,6 +38,34 @@ def test_unfold1d() -> None:
     return None
 
 
+@pytest.mark.order(2)
+def test_fold1d() -> None:
+    """
+    This function is the test for the fold1d.
+    """
+
+    # define inputs
+    inputs: torch.Tensor = torch.rand(64, 32, 100).double()
+
+    # compute fold version
+    inputs_folded: torch.Tensor = fold1d(unfold1d(inputs, 7), 100, 7)
+
+    # compute check tensor
+    input_ones = torch.ones(inputs.shape, dtype=inputs.dtype)
+    divisor = fold1d(unfold1d(input_ones, 7), 100, 7)
+    check_tensor: torch.Tensor = divisor * inputs
+
+    # check dimensions
+    assert inputs_folded.shape == (64, 32, 100), "Incorrect shape of fold1d"
+
+    # check values
+    assert (
+        inputs_folded != check_tensor
+    ).sum().item() == 0, "Incorrect values of unfold"
+
+    return None
+
+
 @pytest.mark.order(3)
 def test_conv1d_forward() -> None:
     """

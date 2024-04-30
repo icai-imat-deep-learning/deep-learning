@@ -12,7 +12,7 @@ from src.utils import parameters_to_double, set_seed
 set_seed(42)
 
 
-@pytest.mark.order(6)
+@pytest.mark.order(5)
 @torch.no_grad()
 def test_maxout_forward() -> None:
     """
@@ -109,7 +109,7 @@ def test_maxout_forward() -> None:
     return None
 
 
-@pytest.mark.order(7)
+@pytest.mark.order(6)
 def test_maxout_backward() -> None:
     """
     _summary_
