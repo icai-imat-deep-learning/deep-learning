@@ -50,7 +50,7 @@ This function is contained in the src.data module. You should use the last 42 we
 
 ### Performance (2 points)
 
-This is not a specific function but a performance you should achieve with your best model in the test set. A MAE lower than 2.7 would be 0.5 points, lower than 2.35 would be 1.5 points and lower than 2.1 would be 2 points. Now you can use the nn package and you should use a LSTM model.
+This is not a specific function but a performance you should achieve with your best model in the test set. A MAE lower than 2.7 would be 0.5 points, lower than 2.35 would be 1.5 points and lower than 2.2 would be 2 points. Now you can use the nn package and you should use a LSTM model.
 
 ### Mypy type checking (0.5 points)
 
