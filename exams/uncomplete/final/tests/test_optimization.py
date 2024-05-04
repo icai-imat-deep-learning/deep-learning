@@ -83,9 +83,8 @@ def test_nadam(
 
         # check parameters of both models
         for parameter1, parameter2 in zip(model1.parameters(), model2.parameters()):
-            if (
-                parameter1.data.round(decimals=2) != parameter2.data.round(decimals=2)
-            ).sum() > 10:
-                assert False, "Incorrect return of the algorithm"
+            assert torch.allclose(
+                parameter1.data, parameter2.data, atol=1e-2
+            ), "Incorrect return of the algorithm"
 
     return None
