@@ -84,7 +84,7 @@ def test_nadam(
         # check parameters of both models
         for parameter1, parameter2 in zip(model1.parameters(), model2.parameters()):
             assert torch.allclose(
-                parameter1.data, parameter2.data, atol=1e-2
+                parameter1.data, parameter2.data, atol=1e-3
             ), "Incorrect return of the algorithm"
 
     return None
