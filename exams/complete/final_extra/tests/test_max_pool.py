@@ -5,12 +5,12 @@ import torch
 import pytest
 
 # own modules
-from src.max_pool import unfold_max_pool, MaxPool2d
+from src.max_pool import unfold_max_pool_2d, MaxPool2d
 from src.utils import set_seed
 
 
 @pytest.mark.order(2)
-def test_unfold_max_pool() -> None:
+def test_unfold_max_pool_2d() -> None:
     """
     This function is the test for the unfold1d.
     """
@@ -19,7 +19,7 @@ def test_unfold_max_pool() -> None:
     inputs: torch.Tensor = torch.rand(64, 3, 32, 32)
 
     # unfold inputs
-    inputs_unfolded: torch.Tensor = unfold_max_pool(inputs, 4, 1, 0)
+    inputs_unfolded: torch.Tensor = unfold_max_pool_2d(inputs, 4, 1, 0)
 
     # check dimensions
     assert inputs_unfolded.shape[:2] == (64 * 3, 16), "Incorrect shape of unfold"
@@ -38,12 +38,12 @@ def test_unfold_max_pool() -> None:
     return None
 
 
-@pytest.mark.order(2)
+@pytest.mark.order(4)
 def test_max_pool_forward() -> None:
     # loop with different seeds
     for seed in range(10):
         # define inputs
-        inputs: torch.Tensor = torch.rand(64, 6, 32, 32)
+        inputs: torch.Tensor = torch.rand(64, 3, 32, 32)
 
         # define models
         set_seed(seed)
@@ -62,5 +62,50 @@ def test_max_pool_forward() -> None:
 
         # check outputs
         assert torch.allclose(outputs, outputs_torch, atol=1e-10), "Incorrect outputs"
+
+    return None
+
+
+@pytest.mark.order(5)
+def test_max_pool_backward() -> None:
+    # loop with different seeds
+    for seed in range(10):
+        # set seed
+        set_seed(seed)
+
+        # define inputs
+        inputs: torch.Tensor = torch.rand(64, 3, 32, 32)
+        inputs.requires_grad_(True)
+
+        # define models
+        model = MaxPool2d(4, stride=1)
+        model_torch = torch.nn.MaxPool2d(4, stride=1)
+
+        # compute backward of our maxpool
+        outputs = model(inputs)
+        if inputs.grad is not None:
+            inputs.grad.zero_()
+        outputs.sum().backward()
+        if inputs.grad is None:
+            assert False, "Gradients not returned, none value detected"
+        grad_inputs: torch.Tensor = inputs.grad.clone()
+
+        # compute backward of pytorch maxpool
+        outputs_torch = model_torch(inputs)
+        inputs.grad.zero_()
+        outputs_torch.sum().backward()
+        if inputs.grad is None:
+            assert False, "Gradients not returned, none value detected"
+        grad_inputs_torch: torch.Tensor = inputs.grad.clone()
+
+        # check output size
+        assert (
+            grad_inputs.shape == grad_inputs_torch.shape
+        ), f"Incorrect outputs shape, expected {outputs_torch.shape}, got {outputs.shape}"
+
+        # check outputs
+        assert torch.allclose(
+            grad_inputs, grad_inputs_torch, atol=1e-10
+        ), "Incorrect outputs"
 
     return None
