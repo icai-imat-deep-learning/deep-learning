@@ -35,6 +35,8 @@ class GroupNorm(torch.nn.Module):
             self.weight = torch.nn.Parameter(torch.empty(num_channels, dtype=dtype))
             self.bias = torch.nn.Parameter(torch.empty(num_channels, dtype=dtype))
 
+        self.reset_parameters()
+
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
         This is the forward pass of the module.
@@ -61,9 +63,20 @@ class GroupNorm(torch.nn.Module):
 
         # compute affine transformation
         if self.affine:
-            outputs = outputs * self.weight + self.bias
+            outputs = outputs.view(
+                original_shape[0], original_shape[1], -1
+            ) * self.weight.unsqueeze(0).unsqueeze(2) + self.bias.unsqueeze(
+                0
+            ).unsqueeze(
+                2
+            )
 
         # reshape to original dim
         outputs = outputs.view(original_shape)
 
         return outputs
+
+    def reset_parameters(self) -> None:
+        if self.affine:
+            torch.nn.init.ones_(self.weight)
+            torch.nn.init.zeros_(self.bias)

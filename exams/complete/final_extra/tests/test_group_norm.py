@@ -9,13 +9,20 @@ from src.group_norm import GroupNorm
 from src.utils import set_seed
 
 
-@pytest.mark.order(1)
-def test_group_norm() -> None:
+@pytest.mark.order(4)
+@pytest.mark.parametrize(
+    "shape, num_groups, affine",
+    [((64, 6, 32, 32), 2, False), ((128, 8, 1024), 4, True)],
+)
+def test_group_norm(shape: tuple[int, ...], num_groups: int, affine: bool) -> None:
     """
-    This function is the test for the for
+    This is the test for the forward of the GroupNorm.
 
-    Returns:
-        _description_
+    Args:
+        shape: shape of the input tensor.
+        num_groups: number of groups in the input tensor.
+        affine: bool to indicate affine transformation.
+
     """
 
     # loop with different seeds
@@ -23,15 +30,17 @@ def test_group_norm() -> None:
         # define inputs
         scale = torch.randint(1, 10, (1,)).double()
         bias = torch.randint(-10, 10, (1,)).double()
-        inputs: torch.Tensor = (
-            torch.rand(64, 6, 32, 32, dtype=torch.double) * scale + bias
-        )
+        inputs: torch.Tensor = torch.rand(shape, dtype=torch.double) * scale + bias
 
         # define models
         set_seed(seed)
-        model = GroupNorm(2, 6, affine=False, eps=0, dtype=torch.double)
+        model = GroupNorm(
+            num_groups, shape[1], affine=affine, eps=0, dtype=torch.double
+        )
         set_seed(seed)
-        model_torch = torch.nn.GroupNorm(2, 6, affine=False, eps=0, dtype=torch.double)
+        model_torch = torch.nn.GroupNorm(
+            num_groups, shape[1], affine=affine, eps=0, dtype=torch.double
+        )
 
         outputs = model(inputs)
         outputs_torch = model_torch(inputs)

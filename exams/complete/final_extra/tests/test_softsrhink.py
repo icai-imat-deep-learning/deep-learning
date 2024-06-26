@@ -9,18 +9,28 @@ from src.softshrink import Softshrink
 from src.utils import set_seed
 
 
-@pytest.mark.order(3)
-def test_softshrink_forward() -> None:
+@pytest.mark.order(1)
+@pytest.mark.parametrize("shape, lambd", [((64, 32), 0.5), ((64, 3, 32, 32), 1.0)])
+def test_softshrink_forward(shape: tuple[int, ...], lambd: float) -> None:
+    """
+    This function is the forward test for the Softshrink.
+
+    Args:
+        shape: shape of the tensors to use.
+        lambd: lambd parameter to use.
+    """
+
     for seed in range(10):
         set_seed(seed)
-        inputs: torch.Tensor = torch.rand(64, 32)
+        inputs: torch.Tensor = torch.rand(shape)
 
+        # put elements on the frontier
         inputs[0, 0] = 0.5
         inputs[0, 1] = -0.5
 
         # define models
-        model = Softshrink()
-        model_torch = torch.nn.Softshrink()
+        model = Softshrink(lambd)
+        model_torch = torch.nn.Softshrink(lambd)
 
         # compute outputs
         outputs: torch.Tensor = model(inputs)
@@ -37,20 +47,30 @@ def test_softshrink_forward() -> None:
     return None
 
 
-@pytest.mark.order(4)
-def test_softshrink_backward() -> None:
+@pytest.mark.order(2)
+@pytest.mark.parametrize("shape, lambd", [((64, 32), 0.5), ((64, 3, 32, 32), 1.0)])
+def test_softshrink_backward(shape: tuple[int, ...], lambd: float) -> None:
+    """
+    This function is the backward test for the Softshrink.
+
+    Args:
+        shape: shape of the tensors to use.
+        lambd: lambd parameter to use.
+    """
+
     for seed in range(10):
         set_seed(seed)
-        inputs: torch.Tensor = torch.rand(64, 32)
+        inputs: torch.Tensor = torch.rand(shape)
 
+        # put elements on the frontier
         inputs[0, 0] = 0.5
         inputs[0, 1] = -0.5
 
         inputs.requires_grad_(True)
 
         # define models
-        model = Softshrink()
-        model_torch = torch.nn.Softshrink()
+        model = Softshrink(lambd)
+        model_torch = torch.nn.Softshrink(lambd)
 
         # compute backward of our maxpool
         outputs = model(inputs)

@@ -8,7 +8,7 @@ from typing import Any, Optional
 class EmbeddingFuncion(torch.autograd.Function):
     """
     Class for the implementation of the forward and backward pass of
-    the Embeddings.
+    the Embedding layer.
     """
 
     @staticmethod
@@ -19,11 +19,11 @@ class EmbeddingFuncion(torch.autograd.Function):
         padding_idx: int,
     ) -> torch.Tensor:
         """
-        This is the forward method of the relu.
+        This is the forward method of the Embedding layer.
 
         Args:
             ctx: context for saving elements for the backward.
-            inputs: input tensor. Dimensions: [batch, input dim].
+            inputs: input tensor. Dimensions: [batch].
 
         Returns:
             outputs tensor. Dimensions: [batch, output dim].
@@ -42,7 +42,7 @@ class EmbeddingFuncion(torch.autograd.Function):
         ctx: Any, grad_outputs: torch.Tensor
     ) -> tuple[None, torch.Tensor, None]:
         """
-        This method is the backward of the Maxout.
+        This method is the backward of the Embedding layer.
 
         Args:
             ctx: context for loading elements from the forward.
@@ -50,13 +50,9 @@ class EmbeddingFuncion(torch.autograd.Function):
                 [batch, output dim].
 
         Returns:
-            inputs gradients. Dimensions: [batch, input dim].
-            gradients for the first weights. Dimensions:
-                [output dim, input dim].
-            gradients for the first bias. Dimensions: [output dim].
-            gradient for the second weights. Dimensions: [output dim,
-                input dim].
-            gradient for the second bias. Dimensions: [output dim].
+            None value.
+            inputs gradients. Dimensions: [batch].
+            None value.
         """
 
         # load tensors from the forward
@@ -111,7 +107,7 @@ class Embedding(torch.nn.Module):
         This is the forward pass for the class.
 
         Args:
-            inputs: inputs tensor. Dimensions: [batch, input dim].
+            inputs: inputs tensor. Dimensions: [batch].
 
         Returns:
             outputs tensor. Dimensions: [batch, output dim].

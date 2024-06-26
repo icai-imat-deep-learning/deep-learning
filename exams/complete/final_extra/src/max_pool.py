@@ -11,10 +11,10 @@ def unfold_max_pool_2d(
 ) -> torch.Tensor:
     """
     This function computes the unfold needed for the MaxPool2d.
-    Since the maxpool only comute sthe max over single channel
+    Since the maxpool only computes the max over single channel
     and not over all the channels, we need that the second dimension of
-    our unfold tensors are data from only channel. For that, we
-    recommend to include the channels into another dimension that will
+    our unfold tensors are data from only channel. For that, we will
+    include the channels into another dimension that will
     not be affected by the consequently operations.
 
     Args:
@@ -26,7 +26,7 @@ def unfold_max_pool_2d(
         stride: stride to use in the maxpool operation. As in the case
             of the kernel size, the stride willm be symmetric.
         padding: padding to use in the maxpool operation. As in the
-            case of the kernel
+            case of the kernel.
 
     Returns:
         inputs unfolded. Dimensions: [batch * channels,
@@ -57,8 +57,8 @@ def fold_max_pool_2d(
     Since the maxpool only comute sthe max over single channel
     and not over all the channels, we need that the second dimension of
     our unfold tensors are data from only channel. To do that, we
-    recommend that the fold version recovers the channel dimensions
-    before executing the fold operation.
+    this fold version recovers the channel dimensions before executing 
+    the fold operation.
 
     Args:
         inputs: inputs unfolded. Dimensions: [batch * channels,
@@ -66,8 +66,10 @@ def fold_max_pool_2d(
         output_size: output size for the fold, i.e., the height and
             the width.
         batch_size: batch size
-        stride: _description_
-        padding: _description_
+        stride: stride to use in the maxpool operation. As in the case
+            of the kernel size, the stride willm be symmetric.
+        padding: padding to use in the maxpool operation. As in the
+            case of the kernel.
 
     Returns:
         inputs folded. Dimensions: [batch, channels, height, width].
@@ -105,14 +107,18 @@ class MaxPool2dFunction(torch.autograd.Function):
         padding: int,
     ) -> torch.Tensor:
         """
-        This is the forward method of the relu.
+        This is the forward method of the MaxPool2d.
 
         Args:
             ctx: context for saving elements for the backward.
-            inputs: input tensor. Dimensions: [batch, input dim].
+            inputs: inputs for the model. Dimensions: [batch,
+                channels, height, width].
 
         Returns:
-            outputs tensor. Dimensions: [batch, output dim].
+            output of the layer. Dimensions:
+                [batch, channels,
+                (height + 2*padding - kernel size) / stride + 1,
+                (width + 2*padding - kernel size) / stride + 1]
         """
 
         # unfold inputs and compute outputs
@@ -147,21 +153,21 @@ class MaxPool2dFunction(torch.autograd.Function):
         ctx: Any, grad_outputs: torch.Tensor
     ) -> tuple[torch.Tensor, None, None, None]:
         """
-        This method is the backward of the Maxout.
+        This method is the backward of the MaxPool2d.
 
         Args:
             ctx: context for loading elements from the forward.
             grad_output: outputs gradients. Dimensions:
-                [batch, output dim].
+                [batch, channels,
+                (height + 2*padding - kernel size) / stride + 1,
+                (width + 2*padding - kernel size) / stride + 1]
 
         Returns:
-            inputs gradients. Dimensions: [batch, input dim].
-            gradients for the first weights. Dimensions:
-                [output dim, input dim].
-            gradients for the first bias. Dimensions: [output dim].
-            gradient for the second weights. Dimensions: [output dim,
-                input dim].
-            gradient for the second bias. Dimensions: [output dim].
+            inputs gradients dimensions: [batch, channels,
+                height, width].
+            None value.
+            None value.
+            None value.
         """
 
         # load tensors from the forward
@@ -204,7 +210,7 @@ class MaxPool2dFunction(torch.autograd.Function):
 
 class MaxPool2d(torch.nn.Module):
     """
-    This is the class that represents the Maxout Layer.
+    This is the class that represents the MaxPool2d Layer.
     """
 
     kernel_size: int
@@ -214,7 +220,7 @@ class MaxPool2d(torch.nn.Module):
         self, kernel_size: int, stride: Optional[int], padding: int = 0
     ) -> None:
         """
-        This method is the constructor of the Maxout layer.
+        This method is the constructor of the MaxPool2d layer.
         """
 
         # call super class constructor
@@ -233,10 +239,12 @@ class MaxPool2d(torch.nn.Module):
         This is the forward pass for the class.
 
         Args:
-            inputs: inputs tensor. Dimensions: [batch, input dim].
+            inputs: inputs tensor. Dimensions: [batch, channels,
+                output channels, height, width].
 
         Returns:
-            outputs tensor. Dimensions: [batch, output dim].
+            outputs tensor. Dimensions: [batch, channels,
+                height - kernel size + 1, width - kernel size + 1].
         """
 
         return self.fn(inputs, self.kernel_size, self.stride, self.padding)

@@ -8,7 +8,7 @@ from typing import Any, Optional
 class SoftshrinkFuncion(torch.autograd.Function):
     """
     Class for the implementation of the forward and backward pass of
-    the Embeddings.
+    the Softshrink.
     """
 
     @staticmethod
@@ -18,14 +18,14 @@ class SoftshrinkFuncion(torch.autograd.Function):
         lambd: float,
     ) -> torch.Tensor:
         """
-        This is the forward method of the relu.
+        This is the forward method of the Softshrink.
 
         Args:
             ctx: context for saving elements for the backward.
-            inputs: input tensor. Dimensions: [batch, input dim].
+            inputs: input tensor. Dimensions: [batch, *].
 
         Returns:
-            outputs tensor. Dimensions: [batch, output dim].
+            outputs tensor. Dimensions: [batch, *].
         """
 
         # compute embeddings
@@ -43,21 +43,14 @@ class SoftshrinkFuncion(torch.autograd.Function):
         ctx: Any, grad_outputs: torch.Tensor
     ) -> tuple[torch.Tensor, None]:
         """
-        This method is the backward of the Maxout.
+        This method is the backward of the Softshrink.
 
         Args:
             ctx: context for loading elements from the forward.
-            grad_output: outputs gradients. Dimensions:
-                [batch, output dim].
+            grad_output: outputs gradients. Dimensions: [batch, *].
 
         Returns:
-            inputs gradients. Dimensions: [batch, input dim].
-            gradients for the first weights. Dimensions:
-                [output dim, input dim].
-            gradients for the first bias. Dimensions: [output dim].
-            gradient for the second weights. Dimensions: [output dim,
-                input dim].
-            gradient for the second bias. Dimensions: [output dim].
+            inputs gradients. Dimensions: [batch, *].
         """
 
         # load tensors from the forward
@@ -74,14 +67,14 @@ class SoftshrinkFuncion(torch.autograd.Function):
 
 class Softshrink(torch.nn.Module):
     """
-    This is the class that represents the Embedding Layer.
+    This is the class that represents the Softshrink Layer.
     """
 
     padding_idx: int
 
     def __init__(self, lambd: float = 0.5) -> None:
         """
-        This method is the constructor of the Embedding layer.
+        This method is the constructor of the Softshrink layer.
         """
 
         # call super class constructor
@@ -97,10 +90,10 @@ class Softshrink(torch.nn.Module):
         This is the forward pass for the class.
 
         Args:
-            inputs: inputs tensor. Dimensions: [batch, input dim].
+            inputs: inputs tensor. Dimensions: [batch, *].
 
         Returns:
-            outputs tensor. Dimensions: [batch, output dim].
+            outputs tensor. Dimensions: [batch, *].
         """
 
         return self.fn(inputs, self.lambd)

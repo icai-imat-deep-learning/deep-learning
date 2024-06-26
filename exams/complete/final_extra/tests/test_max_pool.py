@@ -5,51 +5,120 @@ import torch
 import pytest
 
 # own modules
-from src.max_pool import unfold_max_pool_2d, MaxPool2d
+from src.max_pool import unfold_max_pool_2d, fold_max_pool_2d, MaxPool2d
 from src.utils import set_seed
 
 
-@pytest.mark.order(2)
-def test_unfold_max_pool_2d() -> None:
+@pytest.mark.order(5)
+@pytest.mark.parametrize(
+    "shape, kernel_size", [((64, 3, 32, 32), 4), ((128, 2, 64, 64), 3)]
+)
+def test_unfold_max_pool_2d(shape: tuple[int, ...], kernel_size: int) -> None:
     """
-    This function is the test for the unfold1d.
+    This function is the test for the unfold_max_pool_2d.
+
+    Args:
+        shape: shape of the input tensor.
+        kernel_size: kernel size for the unfold.
     """
 
     # define inputs
-    inputs: torch.Tensor = torch.rand(64, 3, 32, 32)
+    inputs: torch.Tensor = torch.rand(shape)
 
     # unfold inputs
-    inputs_unfolded: torch.Tensor = unfold_max_pool_2d(inputs, 4, 1, 0)
+    inputs_unfolded: torch.Tensor = unfold_max_pool_2d(inputs, kernel_size, 1, 0)
 
     # check dimensions
-    assert inputs_unfolded.shape[:2] == (64 * 3, 16), "Incorrect shape of unfold"
+    assert inputs_unfolded.shape[:2] == (
+        shape[0] * shape[1],
+        kernel_size**2,
+    ), "Incorrect shape of unfold"
 
     # check values
     assert (
-        inputs[0, 0, :4, :4].reshape(-1) != inputs_unfolded[0, :, 0]
+        inputs[0, 0, :kernel_size, :kernel_size].reshape(-1) != inputs_unfolded[0, :, 0]
     ).sum().item() == 0, "Incorrect values of unfold"
     assert (
-        inputs[0, 1, :4, :4].reshape(-1) != inputs_unfolded[1, :, 0]
+        inputs[0, 1, :kernel_size, :kernel_size].reshape(-1) != inputs_unfolded[1, :, 0]
     ).sum().item() == 0, "Incorrect values of unfold"
     assert (
-        inputs[0, 0, :4, 1:5].reshape(-1) != inputs_unfolded[0, :, 1]
+        inputs[0, 0, :kernel_size, 1 : (kernel_size + 1)].reshape(-1)
+        != inputs_unfolded[0, :, 1]
     ).sum().item() == 0, "Incorrect values of unfold"
 
     return None
 
 
-@pytest.mark.order(4)
-def test_max_pool_forward() -> None:
+@pytest.mark.order(6)
+@pytest.mark.parametrize(
+    "shape,, kernel_size, stride, padding",
+    [((64, 3, 32, 32), 3, 1, 0), ((128, 6, 64, 64), 7, 1, 0)],
+)
+def test_fold_max_pool_2d(
+    shape: tuple[int, ...], kernel_size: int, stride: int, padding: int
+) -> None:
+    """
+    This function is the test for the fold_max_pool_2d.
+    """
+
+    # define inputs
+    inputs: torch.Tensor = torch.rand(shape)
+
+    # compute fold version
+    inputs_folded: torch.Tensor = fold_max_pool_2d(
+        unfold_max_pool_2d(inputs, kernel_size, 1, 0),
+        shape[2],
+        inputs.shape[0],
+        kernel_size,
+        stride,
+        padding,
+    )
+
+    # compute check tensor
+    input_ones = torch.ones(inputs.shape, dtype=inputs.dtype)
+    divisor = fold_max_pool_2d(
+        unfold_max_pool_2d(input_ones, kernel_size, 1, 0),
+        shape[2],
+        inputs.shape[0],
+        kernel_size,
+        stride,
+        padding,
+    )
+    check_tensor: torch.Tensor = divisor * inputs
+
+    # check dimensions
+    assert inputs_folded.shape == shape, "Incorrect shape of fold"
+
+    # check values
+    assert torch.allclose(
+        inputs_folded, check_tensor, atol=1e-5
+    ), "Incorrect values of fold"
+
+    return None
+
+
+@pytest.mark.order(7)
+@pytest.mark.parametrize(
+    "shape, kernel_size", [((64, 3, 32, 32), 4), ((128, 2, 64, 64), 3)]
+)
+def test_max_pool_forward(shape: tuple[int, ...], kernel_size: int) -> None:
+    """
+    This function is the test for the forward of the MaxPool2d.
+
+    Args:
+        shape: shape of the input tensor.
+        kernel_size: kernel size to use.
+    """
+
     # loop with different seeds
     for seed in range(10):
         # define inputs
-        inputs: torch.Tensor = torch.rand(64, 3, 32, 32)
+        set_seed(seed)
+        inputs: torch.Tensor = torch.rand(shape)
 
         # define models
-        set_seed(seed)
-        model = MaxPool2d(4, stride=1)
-        set_seed(42)
-        model_torch = torch.nn.MaxPool2d(4, stride=1)
+        model = MaxPool2d(kernel_size, stride=1)
+        model_torch = torch.nn.MaxPool2d(kernel_size, stride=1)
 
         # compute outputs
         outputs = model(inputs)
@@ -66,20 +135,31 @@ def test_max_pool_forward() -> None:
     return None
 
 
-@pytest.mark.order(5)
-def test_max_pool_backward() -> None:
+@pytest.mark.order(8)
+@pytest.mark.parametrize(
+    "shape, kernel_size", [((64, 3, 32, 32), 4), ((128, 2, 64, 64), 3)]
+)
+def test_max_pool_backward(shape: tuple[int, ...], kernel_size: int) -> None:
+    """
+    This function is the test for the backward of the MaxPool2d.
+
+    Args:
+        shape: shape of the input tensor.
+        kernel_size: kernel size to use.
+    """
+
     # loop with different seeds
     for seed in range(10):
         # set seed
         set_seed(seed)
 
         # define inputs
-        inputs: torch.Tensor = torch.rand(64, 3, 32, 32)
+        inputs: torch.Tensor = torch.rand(shape)
         inputs.requires_grad_(True)
 
         # define models
-        model = MaxPool2d(4, stride=1)
-        model_torch = torch.nn.MaxPool2d(4, stride=1)
+        model = MaxPool2d(kernel_size, stride=1)
+        model_torch = torch.nn.MaxPool2d(kernel_size, stride=1)
 
         # compute backward of our maxpool
         outputs = model(inputs)
