@@ -33,15 +33,7 @@ def unfold_max_pool_2d(
             kernel size * kernel size, number of windows].
     """
 
-    # shrink channel dim
-    inputs_unfolded: torch.Tensor = inputs.flatten(0, 1).unsqueeze(1)
-
-    # unfold
-    inputs_unfolded = F.unfold(
-        inputs_unfolded, kernel_size, stride=stride, padding=padding
-    )
-
-    return inputs_unfolded
+    # TODO
 
 
 def fold_max_pool_2d(
@@ -75,21 +67,7 @@ def fold_max_pool_2d(
         inputs folded. Dimensions: [batch, channels, height, width].
     """
 
-    # unshrink channel dim
-    inputs_folded: torch.Tensor = inputs.contiguous().view(
-        batch_size, -1, inputs.shape[2]
-    )
-
-    # fold
-    inputs_folded = F.fold(
-        inputs_folded,
-        output_size,
-        kernel_size=kernel_size,
-        stride=stride,
-        padding=padding,
-    )
-
-    return inputs_folded
+    # TODO
 
 
 class MaxPool2dFunction(torch.autograd.Function):
@@ -121,32 +99,7 @@ class MaxPool2dFunction(torch.autograd.Function):
                 (width + 2*padding - kernel size) / stride + 1]
         """
 
-        # unfold inputs and compute outputs
-        inputs_unfolded: torch.Tensor = unfold_max_pool_2d(
-            inputs, kernel_size, stride, padding
-        )
-
-        # compute max positions
-        outputs_unfolded: torch.Tensor
-        outputs_unfolded, max_indexes = torch.max(inputs_unfolded, dim=1, keepdim=True)
-        max_indexes = max_indexes[:, 0, :]
-
-        # compute fold version
-        output_size: int = inputs.shape[2] - kernel_size + 1
-        outputs: torch.Tensor = fold_max_pool_2d(
-            outputs_unfolded, output_size, inputs.shape[0], 1, stride, padding
-        )
-
-        # save elements for the backward
-        ctx.save_for_backward(
-            inputs_unfolded,
-            max_indexes,
-            torch.tensor(kernel_size),
-            torch.tensor(stride),
-            torch.tensor(padding),
-        )
-
-        return outputs
+        # TODO
 
     @staticmethod
     def backward(  # type: ignore
@@ -170,42 +123,7 @@ class MaxPool2dFunction(torch.autograd.Function):
             None value.
         """
 
-        # load tensors from the forward
-        (
-            inputs_unfolded,
-            max_indexes,
-            kernel_size_tensor,
-            stride_tensor,
-            padding_tensor,
-        ) = ctx.saved_tensors
-
-        # pass attributes to int
-        kernel_size: int = kernel_size_tensor.item()
-        stride: int = stride_tensor.item()
-        padding: int = padding_tensor.item()
-
-        # compute unfold of grad_outputs
-        grad_outputs_unfolded: torch.Tensor = unfold_max_pool_2d(
-            grad_outputs, 1, stride, padding
-        )
-
-        # compute grad inputs
-        max_indexes = F.one_hot(max_indexes, num_classes=kernel_size**2)
-        max_indexes = max_indexes.permute(0, 2, 1)
-        grad_inputs_unfolded: torch.Tensor = max_indexes * grad_outputs_unfolded
-
-        # fold grad inputs
-        output_size: int = grad_outputs.shape[2] + kernel_size - 1
-        grad_inputs: torch.Tensor = fold_max_pool_2d(
-            grad_inputs_unfolded,
-            output_size,
-            grad_outputs.shape[0],
-            kernel_size,
-            stride,
-            padding,
-        )
-
-        return grad_inputs, None, None, None
+        # TODO
 
 
 class MaxPool2d(torch.nn.Module):
