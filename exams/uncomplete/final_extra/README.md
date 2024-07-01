@@ -27,4 +27,4 @@ or functions from the nn package can be used, except fold and unfold nn function
 adaptations. (1 point)
 2. Development of forward and backward of MaxPool2d. To code it, you have to use the adaptations
 fold and unfold coded before, no other implementation will be allowed. No for-loops or functions
-from the nn package can be used. (2 points
+from the nn package can be used. (2 points)
