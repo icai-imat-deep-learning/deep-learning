@@ -25,7 +25,7 @@ def test_unfold1d() -> None:
     inputs_unfolded: torch.Tensor = unfold1d(inputs, 7)
 
     # check dimensions
-    assert inputs_unfolded.shape == (64, 224, 94), "Incorrect shape of unfold1d"
+    assert inputs_unfolded.shape == (64, 224, 94), "Incorrect shape of unfold"
 
     # check values
     assert (
@@ -56,12 +56,10 @@ def test_fold1d() -> None:
     check_tensor: torch.Tensor = divisor * inputs
 
     # check dimensions
-    assert inputs_folded.shape == (64, 32, 100), "Incorrect shape of fold1d"
+    assert inputs_folded.shape == (64, 32, 100), "Incorrect shape of fold"
 
     # check values
-    assert (
-        inputs_folded != check_tensor
-    ).sum().item() == 0, "Incorrect values of unfold"
+    assert (inputs_folded != check_tensor).sum().item() == 0, "Incorrect values of fold"
 
     return None
 
