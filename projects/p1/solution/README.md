@@ -12,7 +12,7 @@ The first thing you will have to do is install the required dependencies, define
 
 To log the metrics during training and validation, we will be using tensorboard. Install also the extension of vs-code for tensorboard. 
 
-IMPORTANT: You will have to upload your implementation as a zip-file into Moodle.
+IMPORTANT: To submit it is only needed to push in github.
 
 # Structure of the repo
 In this repo, all the functional code is inside the src/ folder. For training the model and save it, the following module must be run:
@@ -23,13 +23,14 @@ In the src.train module there are some hyperparameters at the beginning of the m
 
     python -m src.evaluate
 
-The evaluate file will load a model called best_model.pt inside the models/ folder compute accuracy in the test set and print it in the command line. 
+The evaluate file will load a model called best_model.pt inside the models/ folder compute accuracy in the test set and print it in the command line. This is the only model that will be uploaded to github.
 
 
 # Automatic tests (QA)
 These tests are already provided to you, you can run them by executing:
 
     pytest .
+    
 At the beginning, these tests will fail and you will have to implement the required functions properly for them to be set as PASS. The grades achieved by these tests can be overridden by the grade from a professor if the test is fulfilled but the goal of the function/class to be completed is not reached.
 
 # Inspection of the code
