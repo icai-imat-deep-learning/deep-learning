@@ -1,7 +1,7 @@
 # # folders
 data/
 runs/
-models/
+# models/
 __pycache__/
 .vscode/
 .mypy_cache/
