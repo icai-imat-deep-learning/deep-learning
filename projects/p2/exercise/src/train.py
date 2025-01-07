@@ -1,9 +1,7 @@
-# deep learning libraries
+# 3pps
 import torch
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
-
-# other libraries
 from tqdm.auto import tqdm
 
 # own modules

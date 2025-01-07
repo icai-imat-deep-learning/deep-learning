@@ -1,8 +1,8 @@
-# deep learning libraries
-import torch
-
-# other libraries
+# standard libraries
 import os
+
+# 3pps
+import torch
 import pytest
 
 # own modules

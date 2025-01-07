@@ -1,7 +1,5 @@
-# deep learning libraries
+# 3pps
 import torch
-
-# other libraries
 import pytest
 
 # own modules

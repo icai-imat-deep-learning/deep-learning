@@ -1,11 +1,4 @@
-# deep learning libraries
-import torch
-import numpy as np
-from torch.utils.data import Dataset, DataLoader, random_split
-from torchvision import transforms
-from torch.jit import RecursiveScriptModule
-
-# other libraries
+# standard libraries
 import os
 import random
 import requests
@@ -13,6 +6,13 @@ import tarfile
 import shutil
 from requests.models import Response
 from tarfile import TarFile
+
+# 3pps
+import torch
+import numpy as np
+from torch.utils.data import Dataset, DataLoader, random_split
+from torchvision import transforms
+from torch.jit import RecursiveScriptModule
 from PIL import Image
 
 
@@ -135,7 +135,7 @@ def download_data(path: str) -> None:
     # loop for saving processed data
     list_splits: tuple[str, str] = ("train", "val")
     for i in range(len(list_splits)):
-        list_class_dirs = os.listdir(f"{path}/imagenette2/{list_splits[i]}")
+        list_class_dirs = sorted(os.listdir(f"{path}/imagenette2/{list_splits[i]}"))
         for j in range(len(list_class_dirs)):
             list_dirs = os.listdir(
                 f"{path}/imagenette2/{list_splits[i]}/{list_class_dirs[j]}"
