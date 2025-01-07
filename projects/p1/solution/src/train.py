@@ -26,7 +26,7 @@ def main() -> None:
     """
 
     # hyperparameters
-    epochs: int = 100
+    epochs: int = 2
     lr: float = 1e-3
     batch_size: int = 64
     hidden_sizes: tuple[int, ...] = (256, 128, 64)
