@@ -18,4 +18,32 @@ The exams folder contains the past exams, and the ones used for this year. Past 
 
 ## Grader
 
-The grader can be used to grade any GitHub Classroom project.  
+The grader can be used to grade any GitHub Classroom project. To be able to set up the grader and use it, the easier way is to clone all the repositories locally with Classroom CLI. In order to to that first you will need to follow the following steps:
+
+- Install gh:
+
+    ```
+    sudo apt install gh
+    ```
+
+- Auth login:
+
+    ```
+    gh auth login
+    ```
+
+- Install classroom extension:
+
+    ```
+    gh extension install github/gh-classroom
+    ```
+
+- Clone all the repositories:
+
+    ```
+    gh classroom clone student-repos -a <code>
+    ```
+
+These steps are meant to be executed from wsl or linux. The code can be found in the assignment in GitHub Classroom, when clicking the download button.
+
+After downloading all the repositories 
