@@ -19,11 +19,11 @@ class ReLUFunction(torch.autograd.Function):
         This is the forward method of the relu.
 
         Args:
-            ctx: context for saving elements for the backward.
-            inputs: input tensor. Dimensions: [*].
+            ctx: Context for saving elements for the backward.
+            inputs: Input tensor. Dimensions: [*].
 
         Returns:
-            outputs tensor. Dimensions: [*], same as inputs.
+            Outputs tensor. Dimensions: [*], same as inputs.
         """
 
         # save tensors for the backward
@@ -41,11 +41,11 @@ class ReLUFunction(torch.autograd.Function):
         This method is the backward of the relu.
 
         Args:
-            ctx: context for loading elements from the forward.
-            grad_output: outputs gradients. Dimensions: [*].
+            ctx: Context for loading elements from the forward.
+            grad_output: Outputs gradients. Dimensions: [*].
 
         Returns:
-            inputs gradients. Dimensions: [*], same as the grad_output.
+            Inputs gradients. Dimensions: [*], same as the grad_output.
         """
 
         # load tensors from the forward
@@ -79,10 +79,10 @@ class ReLU(torch.nn.Module):
         This is the forward pass for the class.
 
         Args:
-            inputs: inputs tensor. Dimensions: [*].
+            inputs: Inputs tensor. Dimensions: [*].
 
         Returns:
-            outputs tensor. Dimensions: [*] (same as the input).
+            Outputs tensor. Dimensions: [*] (same as the input).
         """
 
         return self.fn(inputs)
@@ -101,15 +101,15 @@ class LinearFunction(torch.autograd.Function):
         This method is the forward pass of the Linear layer.
 
         Args:
-            ctx: contex for saving elements for the backward.
-            inputs: inputs tensor. Dimensions:
+            ctx: Contex for saving elements for the backward.
+            inputs: Inputs tensor. Dimensions:
                 [batch, input dimension].
             weight: weights tensor.
                 Dimensions: [output dimension, input dimension].
-            bias: bias tensor. Dimensions: [output dimension].
+            bias: Bias tensor. Dimensions: [output dimension].
 
         Returns:
-            outputs tensor. Dimensions: [batch, output dimension].
+            Outputs tensor. Dimensions: [batch, output dimension].
         """
 
         # save elements for backward
@@ -125,17 +125,15 @@ class LinearFunction(torch.autograd.Function):
         This method is the backward for the Linear layer.
 
         Args:
-            ctx: context for loading elements from the forward.
-            grad_output: outputs gradients.
+            ctx: Context for loading elements from the forward.
+            grad_output: Outputs gradients.
                 Dimensions: [batch, output dimension].
 
         Returns:
-            tuple of gradients, gradients of the inputs, the weights
-                and the bias, in respective order.
-                Inputs gradients dimension: [batch, input dimension].
-                Weights gradients dimension:
-                [output dimension, input dimension].
-                Bias gradients dimension: [output dimension].
+            Inputs gradients. Dimensions: [batch, input dimension].
+            Weights gradients. Dimensions: [output dimension, 
+                input dimension].
+            Bias gradients. Dimension: [output dimension].
         """
 
         # load elements from forward
@@ -154,6 +152,12 @@ class LinearFunction(torch.autograd.Function):
 class Linear(torch.nn.Module):
     """
     This is the class that represents the Linear Layer.
+    
+    Attributes:
+        weight: Weight torch parameter. Dimensions: [output dimension, 
+            input dimension].
+        bias: Bias torch parameter. Dimensions: [output dimension].
+        fn: Autograd function.
     """
 
     def __init__(self, input_dim: int, output_dim: int) -> None:
@@ -163,8 +167,8 @@ class Linear(torch.nn.Module):
         linear layer in pytorch. The parameters should be initialized
 
         Args:
-            input_dim: input dimension.
-            output_dim: output dimension.
+            input_dim: Input dimension.
+            output_dim: Output dimension.
         """
 
         # call super class constructor
@@ -189,10 +193,10 @@ class Linear(torch.nn.Module):
         This method if the forward pass of the layer.
 
         Args:
-            inputs: inputs tensor. Dimenions: [batch, input dim].
+            inputs: Inputs tensor. Dimensions: [batch, input dim].
 
         Returns:
-            outputs tensor. Dimensions: [batch, output dim].
+            Outputs tensor. Dimensions: [batch, output dim].
         """
 
         return self.fn(inputs, self.weight, self.bias)
@@ -231,16 +235,18 @@ class Conv2dFunction(torch.autograd.Function):
         This function is the forward method of the class.
 
         Args:
-            ctx: context for saving elements for the backward.
-            inputs: inputs for the model. Dimensions: [batch,
+            ctx: Context for saving elements for the backward.
+            inputs: Inputs for the model. Dimensions: [batch,
                 input channels, height, width].
-            weight: weight of the layer.
+            weight: Weight of the layer.
                 Dimensions: [output channels, input channels,
                 kernel size, kernel size].
-            bias: bias of the layer. Dimensions: [output channels].
+            bias: Bias of the layer. Dimensions: [output channels].
+            padding: padding parameter.
+            stride: stride parameter.
 
         Returns:
-            output of the layer. Dimensions:
+            Output of the layer. Dimensions:
                 [batch, output channels,
                 (height + 2*padding - kernel size) / stride + 1,
                 (width + 2*padding - kernel size) / stride + 1]
@@ -276,21 +282,20 @@ class Conv2dFunction(torch.autograd.Function):
         This is the backward of the layer.
 
         Args:
-            ctx: contex for loading elements needed in the backward.
-            grad_output: outputs gradients. Dimensions:
+            ctx: Context for loading elements needed in the backward.
+            grad_output: Outputs gradients. Dimensions:
                 [batch, output channels,
                 (height + 2*padding - kernel size) / stride + 1,
                 (width + 2*padding - kernel size) / stride + 1]
 
         Returns:
-            tuple of gradients of inputs, weights, bias and two None
-                values (you should not return a gradient for padding
-                and stride).
-                Inputs gradients dimensions: [batch, input channels,
+            Inputs gradients. Dimensions: [batch, input channels, 
                 height, width].
-                Weights gradients dimensions: [output channels,
+            Weight gradients. Dimensions: [output channels,
                 input channels, kernel size, kernel size].
-                Bias gradients dimensions: [output channels].
+            Bias gradients. Dimensions: [output channels].
+            None.
+            None.
         """
 
         # load saved tensors
@@ -343,6 +348,14 @@ class Conv2dFunction(torch.autograd.Function):
 class Conv2d(torch.nn.Module):
     """
     This is the class that represents the Linear Layer.
+    
+    Attributes:
+        weight: Weight pytorch parameter. Dimensions: [output channels,
+            input channels, kernel size, kernel size].
+        bias: Bias torch parameter. Dimensions: [output channels].
+        padding: Padding parameter.
+        stride: Stride parameter.
+        fn: Autograd function.
     """
 
     def __init__(
@@ -358,9 +371,9 @@ class Conv2d(torch.nn.Module):
         pytorch convention.
 
         Args:
-            input_channels: input dimension.
-            output_channels: output dimension.
-            kernel_size: kernel size to use in the convolution.
+            input_channels: Input dimension.
+            output_channels: Output dimension.
+            kernel_size: Kernel size to use in the convolution.
         """
 
         # call super class constructor
@@ -387,7 +400,7 @@ class Conv2d(torch.nn.Module):
         This method if the forward pass of the layer.
 
         Args:
-            inputs: inputs tensor. Dimensions: [batch, input channels,
+            inputs: Inputs tensor. Dimensions: [batch, input channels,
                 output channels, height, width].
 
         Returns:
@@ -417,7 +430,7 @@ class Block(torch.nn.Module):
     Neural net block composed of 3x(conv(kernel=3, padding=1) + ReLU).
 
     Attributes:
-        net: sequential containing all the layers.
+        net: Sequential containing all the layers.
     """
 
     def __init__(self, input_channels: int, output_channels: int, stride: int) -> None:
@@ -429,9 +442,9 @@ class Block(torch.nn.Module):
         dimensions.
 
         Args:
-            input_channels: input channels for Block.
-            output_channels: output channels for Block.
-            stride: stride only for the second convolution of the
+            input_channels: Input channels for Block.
+            output_channels: Output channels for Block.
+            stride: Stride only for the second convolution of the
                 Block.
         """
 
@@ -456,14 +469,14 @@ class Block(torch.nn.Module):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        This method if the foward pass.
+        This method if the forward pass.
 
         Args:
-            inputs: batch of tensors.
-                Dimensions: [batch, input_channels, height, width]
+            inputs: Inputs batch of tensors.
+                Dimensions: [batch, input_channels, height, width].
 
         Returns:
-            batch of tensors. Dimensions: [batch, output_channels,
+            Outputs batch of tensors. Dimensions: [batch, output_channels,
                 (height - 1)/stride + 1, (width - 1)/stride + 1].
         """
 
@@ -485,8 +498,8 @@ class CNNModel(torch.nn.Module):
         Constructor of the class CNNModel.
 
         Args:
-            layers: output channel dimensions of the Blocks.
-            input_channels: input channels of the model.
+            layers: Output channel dimensions of the Blocks.
+            input_channels: Input channels of the model.
         """
 
         # call torch.nn.Module constructor
@@ -515,15 +528,16 @@ class CNNModel(torch.nn.Module):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        This method returns a batch of logits.
-        It is the output of the neural network.
+        This method returns a batch of logits. It is the output of the 
+        neural network.
 
         Args:
-            inputs: batch of images.
+            inputs: Inputs batch of images.
                 Dimensions: [batch, channels, height, width].
 
         Returns:
-            batch of logits. Dimensions: [batch, output_channels].
+            Outputs batch of logits. Dimensions: [batch, 
+                output_channels].
         """
 
         # compute the features
