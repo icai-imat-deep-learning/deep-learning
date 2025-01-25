@@ -100,7 +100,7 @@ def test_linear() -> None:
     """
     This function is the test for the linear model.
     """
-    
+
     for seed in range(10):
         # define inputs
         inputs: torch.Tensor = torch.rand(64, 30).double()
@@ -143,18 +143,24 @@ def test_linear() -> None:
         grad_weight_torch: torch.Tensor = model_torch.weight.grad.clone()
         grad_bias_torch: torch.Tensor = model_torch.bias.grad.clone()
         grad_inputs_torch: torch.Tensor = inputs.grad.clone()
-        
+
         # check values of the forward
         assert torch.allclose(outputs, outputs_torch, 1e-8), "Incorrect forward"
 
         # check values of the inputs gradients
-        assert torch.allclose(grad_inputs, grad_inputs_torch, 1e-8), "Incorrect inputs gradients"
+        assert torch.allclose(
+            grad_inputs, grad_inputs_torch, 1e-8
+        ), "Incorrect inputs gradients"
 
         # check values of the weights gradients
-        assert torch.allclose(grad_weight, grad_weight_torch, 1e-8), "Incorrect weights gradient"
+        assert torch.allclose(
+            grad_weight, grad_weight_torch, 1e-8
+        ), "Incorrect weights gradient"
 
         # check values of the bias gradients
-        assert torch.allclose(grad_bias, grad_bias_torch, 1e-8), "Incorrect bias gradients"
+        assert torch.allclose(
+            grad_bias, grad_bias_torch, 1e-8
+        ), "Incorrect bias gradients"
 
         return None
 
@@ -164,7 +170,7 @@ def test_conv() -> None:
     """
     This function is the test for the conv model.
     """
-    
+
     for seed in range(10):
         # define inputs
         inputs: torch.Tensor = torch.rand(64, 3, 32, 32).double()
@@ -211,13 +217,19 @@ def test_conv() -> None:
         assert torch.allclose(outputs, outputs_torch, 1e-8), "Incorrect forward"
 
         # check values of the inputs gradients
-        assert torch.allclose(grad_inputs, grad_inputs_torch, 1e-8), "Incorrect inputs gradients"
+        assert torch.allclose(
+            grad_inputs, grad_inputs_torch, 1e-8
+        ), "Incorrect inputs gradients"
 
         # check values of the weights gradients
-        assert torch.allclose(grad_weight, grad_weight_torch, 1e-8), "Incorrect weights gradient"
+        assert torch.allclose(
+            grad_weight, grad_weight_torch, 1e-8
+        ), "Incorrect weights gradient"
 
         # check values of the bias gradients
-        assert torch.allclose(grad_bias, grad_bias_torch, 1e-8), "Incorrect bias gradients"
+        assert torch.allclose(
+            grad_bias, grad_bias_torch, 1e-8
+        ), "Incorrect bias gradients"
 
         return None
 

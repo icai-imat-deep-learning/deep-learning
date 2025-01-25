@@ -27,7 +27,7 @@ class ImagenetteDataset(Dataset):
 
         Args:
             path: Path of the dataset.
-        
+
         Returns:
             None.
         """

@@ -131,7 +131,7 @@ class LinearFunction(torch.autograd.Function):
 
         Returns:
             Inputs gradients. Dimensions: [batch, input dimension].
-            Weights gradients. Dimensions: [output dimension, 
+            Weights gradients. Dimensions: [output dimension,
                 input dimension].
             Bias gradients. Dimension: [output dimension].
         """
@@ -152,9 +152,9 @@ class LinearFunction(torch.autograd.Function):
 class Linear(torch.nn.Module):
     """
     This is the class that represents the Linear Layer.
-    
+
     Attributes:
-        weight: Weight torch parameter. Dimensions: [output dimension, 
+        weight: Weight torch parameter. Dimensions: [output dimension,
             input dimension].
         bias: Bias torch parameter. Dimensions: [output dimension].
         fn: Autograd function.
@@ -289,7 +289,7 @@ class Conv2dFunction(torch.autograd.Function):
                 (width + 2*padding - kernel size) / stride + 1]
 
         Returns:
-            Inputs gradients. Dimensions: [batch, input channels, 
+            Inputs gradients. Dimensions: [batch, input channels,
                 height, width].
             Weight gradients. Dimensions: [output channels,
                 input channels, kernel size, kernel size].
@@ -348,7 +348,7 @@ class Conv2dFunction(torch.autograd.Function):
 class Conv2d(torch.nn.Module):
     """
     This is the class that represents the Linear Layer.
-    
+
     Attributes:
         weight: Weight pytorch parameter. Dimensions: [output channels,
             input channels, kernel size, kernel size].
@@ -528,7 +528,7 @@ class CNNModel(torch.nn.Module):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
-        This method returns a batch of logits. It is the output of the 
+        This method returns a batch of logits. It is the output of the
         neural network.
 
         Args:
@@ -536,7 +536,7 @@ class CNNModel(torch.nn.Module):
                 Dimensions: [batch, channels, height, width].
 
         Returns:
-            Outputs batch of logits. Dimensions: [batch, 
+            Outputs batch of logits. Dimensions: [batch,
                 output_channels].
         """
 
