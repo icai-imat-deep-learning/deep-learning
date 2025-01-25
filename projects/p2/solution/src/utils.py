@@ -65,9 +65,9 @@ class ImagenetteDataset(Dataset):
         # load image
         transformations = transforms.Compose([transforms.ToTensor()])
         image = Image.open(image_path)
-        image = transformations(image)
+        image_tensor: torch.Tensor = transformations(image)
 
-        return image, label
+        return image_tensor, label
 
 
 def load_imagenette_data(
