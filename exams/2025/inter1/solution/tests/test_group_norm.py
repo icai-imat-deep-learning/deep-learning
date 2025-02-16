@@ -19,7 +19,7 @@ def test_group_norm() -> None:
     Returns:
         None.
     """
-    
+
     for seed in range(10):
         # Set seed
         set_seed(seed)

@@ -15,7 +15,7 @@ class GroupNorm(torch.nn.Module):
         num_channels: Number of channels.
         eps: epsilon to avoid division by 0.
     """
-    
+
     def __init__(self, num_groups: int, num_channels: int, eps: float = 1e-5) -> None:
         """
         This method is the constructor of GroupNorm class.
@@ -36,7 +36,7 @@ class GroupNorm(torch.nn.Module):
         self.num_groups = num_groups
         self.num_channels = num_channels
         self.eps = eps
-        
+
         return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
