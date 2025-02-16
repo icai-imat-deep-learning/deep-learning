@@ -108,7 +108,7 @@ def test_hardshrink_backward() -> None:
         ), "Incorrect gradients inputs value"
 
     # Define inputs
-    inputs = torch.zeros(64, 6, 32, 32)
+    inputs = torch.zeros(64, 6, 32, 32).requires_grad_(True)
 
     # Compute outputs backward
     outputs = module(inputs)

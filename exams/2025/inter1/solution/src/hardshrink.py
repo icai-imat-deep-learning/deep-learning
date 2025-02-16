@@ -49,6 +49,7 @@ class HardshrinkFunction(torch.autograd.Function):
 
         Returns:
             inputs gradients. Dimensions: [*], same as the grad_output.
+            None.
         """
 
         # load tensors from the forward
@@ -59,7 +60,7 @@ class HardshrinkFunction(torch.autograd.Function):
         grad_input[mask] = 0
         grad_input *= grad_output
 
-        return grad_input
+        return grad_input, None
 
 
 class Hardshrink(torch.nn.Module):
