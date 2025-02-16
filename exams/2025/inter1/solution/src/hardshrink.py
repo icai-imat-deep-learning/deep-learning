@@ -1,5 +1,5 @@
 """
-
+This module contains the code for Hardshrink.
 """
 
 # Standard libraries
@@ -39,7 +39,9 @@ class HardshrinkFunction(torch.autograd.Function):
         return outputs
 
     @staticmethod
-    def backward(ctx: Any, grad_output: torch.Tensor) -> torch.Tensor:  # type: ignore
+    def backward(  # type: ignore
+        ctx: Any, grad_output: torch.Tensor
+    ) -> tuple[torch.Tensor, None]:
         """
         This method is the backward of the Hardshrink.
 
