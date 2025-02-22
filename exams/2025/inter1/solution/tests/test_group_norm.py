@@ -8,11 +8,11 @@ import pytest
 
 # Own libraries
 from src.group_norm import GroupNorm
-from tests.utils import set_seed
 
 
 @pytest.mark.order(1)
-def test_group_norm() -> None:
+@pytest.mark.parametrize("num_groups", [2, 3])
+def test_group_norm(num_groups: int, inputs: torch.Tensor) -> None:
     """
     This function is to test the GroupNorm.
 
@@ -20,28 +20,23 @@ def test_group_norm() -> None:
         None.
     """
 
-    for seed in range(10):
-        # Set seed
-        set_seed(seed)
+    # Define modules
+    module: torch.nn.Module = GroupNorm(num_groups, inputs.shape[1])
+    module_torch: torch.nn.Module = torch.nn.GroupNorm(
+        num_groups, inputs.shape[1], affine=False
+    )
 
-        # Define inputs
-        inputs: torch.Tensor = torch.rand(64, 6, 32, 32).uniform_(-10, 10)
+    # Compute outputs
+    outputs: torch.Tensor = module(inputs)
+    outputs_torch: torch.Tensor = module_torch(inputs)
 
-        # Define modules
-        module: torch.nn.Module = GroupNorm(2, 6)
-        module_torch: torch.nn.Module = torch.nn.GroupNorm(2, 6, affine=False)
+    # Check shape
+    assert outputs.shape == outputs_torch.shape, (
+        f"Incorrect output shape, expected {outputs_torch.shape} and got "
+        f"{outputs.shape}"
+    )
 
-        # Compute outputs
-        outputs: torch.Tensor = module(inputs)
-        outputs_torch: torch.Tensor = module_torch(inputs)
-
-        # Check shape
-        assert outputs.shape == outputs_torch.shape, (
-            f"Incorrect output shape, expected {outputs_torch.shape} and got "
-            f"{outputs.shape}"
-        )
-
-        # Check outputs value
-        assert torch.allclose(outputs, outputs_torch), "Incorrect outputs value"
+    # Check outputs value
+    assert torch.allclose(outputs, outputs_torch), "Incorrect outputs value"
 
     return None

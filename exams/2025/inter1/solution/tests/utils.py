@@ -5,6 +5,7 @@ This module contains utils for testing functions.
 # Standard libraries
 import os
 import random
+from typing import Any
 
 # 3pps
 import torch
@@ -37,3 +38,7 @@ def set_seed(seed: int) -> None:
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 
     return None
+
+
+def add_seed(parameters: tuple[Any, ...], num_seeds: int = 3) -> list[tuple[Any, ...]]:
+    return [(*parameters, seed) for seed in range(num_seeds)]

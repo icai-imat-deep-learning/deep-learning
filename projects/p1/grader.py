@@ -1,4 +1,8 @@
-# standard libraries
+"""
+This module contains the code to grade the p1.
+"""
+
+# Standard libraries
 import os
 import shutil
 import subprocess
@@ -8,7 +12,7 @@ import torch
 from tqdm.auto import tqdm
 
 # static variables
-DATA_PATH: str = "p1-submissions"
+DATA_PATH: str = "p1-submission"
 
 # set default device
 torch.set_default_device("cpu")

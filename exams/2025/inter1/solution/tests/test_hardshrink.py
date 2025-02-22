@@ -8,29 +8,23 @@ import pytest
 
 # Own libraries
 from src.hardshrink import Hardshrink
-from tests.utils import set_seed
 
 
-@pytest.mark.order(2)
-def test_hardshrink_forward() -> None:
-    """
-    This function is to test the Hardshrink forward pass.
+class TestHardShrinnk:
+    @pytest.mark.order(2)
+    def test_hardshrink_forward(
+        self, inputs: torch.Tensor, inputs_zero: torch.Tensor
+    ) -> None:
+        """
+        This function is to test the Hardshrink forward pass.
 
-    Returns:
-        None.
-    """
+        Returns:
+            None.
+        """
 
-    # Define modules
-    module: torch.nn.Module = Hardshrink()
-    module_torch: torch.nn.Module = torch.nn.Hardshrink()
-
-    # Iter over seeds
-    for seed in range(10):
-        # Set seed
-        set_seed(seed)
-
-        # Define inputs
-        inputs: torch.Tensor = torch.rand(64, 6, 32, 32).uniform_(-10, 10)
+        # Define modules
+        module: torch.nn.Module = Hardshrink()
+        module_torch: torch.nn.Module = torch.nn.Hardshrink()
 
         # Compute outputs
         outputs: torch.Tensor = module(inputs)
@@ -45,41 +39,33 @@ def test_hardshrink_forward() -> None:
         # Check outputs value
         assert torch.allclose(outputs, outputs_torch), "Incorrect outputs value"
 
-    # Define inputs
-    inputs = torch.zeros(64, 6, 32, 32)
+        # Compute outputs
+        outputs = module(inputs_zero)
+        outputs_torch = module_torch(inputs_zero)
 
-    # Compute outputs
-    outputs = module(inputs)
-    outputs_torch = module_torch(inputs)
+        # Check outputs value
+        assert torch.allclose(outputs, outputs_torch), "Incorrect outputs value at zero"
 
-    # Check outputs value
-    assert torch.allclose(outputs, outputs_torch), "Incorrect outputs value at zero"
+        return None
 
-    return None
+    @pytest.mark.order(3)
+    def test_hardshrink_backward(
+        self, inputs: torch.Tensor, inputs_zero: torch.Tensor
+    ) -> None:
+        """
+        This function is to test the Hardshrink backward pass.
 
+        Returns:
+            None.
+        """
 
-@pytest.mark.order(3)
-def test_hardshrink_backward() -> None:
-    """
-    This function is to test the Hardshrink backward pass.
+        # Activate gradients
+        inputs.requires_grad_(True)
+        inputs_zero.requires_grad_(True)
 
-    Returns:
-        None.
-    """
-
-    # Define modules
-    module: torch.nn.Module = Hardshrink()
-    module_torch: torch.nn.Module = torch.nn.Hardshrink()
-
-    # Iter over seeds
-    for seed in range(10):
-        # Set seed
-        set_seed(seed)
-
-        # Define inputs
-        inputs: torch.Tensor = (
-            torch.rand(64, 6, 32, 32).uniform_(-10, 10).requires_grad_(True)
-        )
+        # Define modules
+        module: torch.nn.Module = Hardshrink()
+        module_torch: torch.nn.Module = torch.nn.Hardshrink()
 
         # Compute outputs backward
         outputs: torch.Tensor = module(inputs)
@@ -107,27 +93,24 @@ def test_hardshrink_backward() -> None:
             grad_inputs, grad_inputs_torch
         ), "Incorrect gradients inputs value"
 
-    # Define inputs
-    inputs = torch.zeros(64, 6, 32, 32).requires_grad_(True)
+        # Compute outputs backward
+        outputs = module(inputs_zero)
+        outputs.sum().backward()
+        if inputs_zero.grad is None:
+            assert False, "Gradients not returned, none value detected"
+        grad_inputs = inputs_zero.grad.clone()
 
-    # Compute outputs backward
-    outputs = module(inputs)
-    outputs.sum().backward()
-    if inputs.grad is None:
-        assert False, "Gradients not returned, none value detected"
-    grad_inputs = inputs.grad.clone()
+        # Compute torch outputs backward
+        outputs_torch = module_torch(inputs_zero)
+        inputs_zero.grad.zero_()
+        outputs_torch.sum().backward()
+        if inputs_zero.grad is None:
+            assert False, "Gradients not returned, none value detected"
+        grad_inputs_torch = inputs_zero.grad
 
-    # Compute torch outputs backward
-    outputs_torch = module_torch(inputs)
-    inputs.grad.zero_()
-    outputs_torch.sum().backward()
-    if inputs.grad is None:
-        assert False, "Gradients not returned, none value detected"
-    grad_inputs_torch = inputs.grad
+        # Check outputs value
+        assert torch.allclose(
+            grad_inputs, grad_inputs_torch
+        ), "Incorrect gradients inputs value at zero"
 
-    # Check outputs value
-    assert torch.allclose(
-        grad_inputs, grad_inputs_torch
-    ), "Incorrect gradients inputs value at zero"
-
-    return None
+        return None

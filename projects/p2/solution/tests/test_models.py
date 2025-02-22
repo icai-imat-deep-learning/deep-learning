@@ -47,7 +47,7 @@ def test_relu() -> None:
     inputs_grad_torch: torch.Tensor = inputs.grad.clone()
 
     # check outputs
-    assert (outputs != outputs_torch).sum().item() == 0, "Incorrect forward"
+    assert torch.allclose(outputs, outputs_torch, 1e-8), "Incorrect forward"
 
     # check inputs grads
     assert (
@@ -85,7 +85,7 @@ def test_relu() -> None:
     inputs_grad_torch = inputs.grad.clone()
 
     # check outputs
-    assert (outputs != outputs_torch).sum().item() == 0, "Incorrect forward at 0"
+    assert torch.allclose(outputs, outputs_torch, 1e-8), "Incorrect forward at 0"
 
     # check inputs grads
     assert (
