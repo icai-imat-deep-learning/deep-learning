@@ -8,8 +8,8 @@ import pytest
 from tests.utils import add_seed, set_seed
 
 
-@pytest.fixture(params=[*add_seed((64, 6, 32, 32)), *add_seed((32, 12, 32, 16))])
-def inputs(request) -> torch.Tensor:
+@pytest.fixture(params=[*add_seed((64, 10)), *add_seed((32, 20))])
+def inputs_linear(request) -> torch.Tensor:
     """
     This function is a fixture to define example random inputs.
 
@@ -22,27 +22,23 @@ def inputs(request) -> torch.Tensor:
 
     # Get parameters
     batch_size: int
-    num_channels: int
-    height: int
-    width: int
+    input_dim: int
     seed: int
-    batch_size, num_channels, height, width, seed = request.param
+    batch_size, input_dim, seed = request.param
 
     # Set seed
     set_seed(seed)
 
     # Define inputs
-    inputs: torch.Tensor = (
-        torch.rand(batch_size, num_channels, height, width).uniform_(-10, 10).double()
-    )
+    inputs: torch.Tensor = torch.rand(batch_size, input_dim).uniform_(-10, 10).double()
 
     return inputs
 
 
-@pytest.fixture(params=[(64, 6, 32, 32), (32, 12, 32, 16)])
-def inputs_zero(request) -> torch.Tensor:
+@pytest.fixture(params=[*add_seed((64, 3, 32, 32)), *add_seed((32, 1, 16, 16))])
+def inputs_conv(request) -> torch.Tensor:
     """
-    This function is a fixture to define example zero inputs.
+    This function is a fixture to define example random inputs.
 
     Args:
         request: Argument containing the introduced arguments.
@@ -53,12 +49,18 @@ def inputs_zero(request) -> torch.Tensor:
 
     # Get parameters
     batch_size: int
-    num_channels: int
+    in_channels: int
     height: int
     width: int
-    batch_size, num_channels, height, width = request.param
+    seed: int
+    batch_size, in_channels, height, width, seed = request.param
+
+    # Set seed
+    set_seed(seed)
 
     # Define inputs
-    inputs: torch.Tensor = torch.zeros(batch_size, num_channels, height, width).double()
+    inputs: torch.Tensor = (
+        torch.rand(batch_size, in_channels, height, width).uniform_(-10, 10).double()
+    )
 
     return inputs
