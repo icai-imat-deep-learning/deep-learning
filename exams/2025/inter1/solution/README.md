@@ -17,10 +17,10 @@ In this exercise you will have to implement the forward and backward of the Hard
 
 For this you will have to fill the methods of the class written in src.hardshrink. Link to pytorch documentation of the layer: https://pytorch.org/docs/stable/generated/torch.nn.Hardshrink.html.
 
-### Hardshrink forward (1.5 points)
+### Hardshrink Forward (1.5 points)
 
 This function is contained in the src.hardshrink.
 
-### Hardshrink backward (2.5 points)
+### Hardshrink Backward (2.5 points)
 
 This function is contained in the src.hardshrink.
