@@ -25,7 +25,7 @@ def test_conv(out_channels: int, kernel_size: int, inputs_conv: torch.Tensor) ->
     Returns:
         None.
     """
-    
+
     # Get inputs from fixture
     inputs: torch.Tensor = inputs_conv
 
@@ -34,7 +34,7 @@ def test_conv(out_channels: int, kernel_size: int, inputs_conv: torch.Tensor) ->
     model_torch: torch.nn.Module = torch.nn.Conv2d(
         inputs.shape[1], out_channels, kernel_size, bias=True, dtype=torch.double
     )
-    
+
     # Set same init weights
     model.weight = model_torch.weight
     model.bias = model_torch.bias

@@ -70,12 +70,13 @@ class HuberLossFunction(torch.autograd.Function):
         mask, inputs, targets = ctx.saved_tensors
 
         # Compute gradients inside condition
-        grad_input: torch.Tensor = torch.ones_like(mask).double()
+        grad_input: torch.Tensor = torch.ones_like(inputs)
         grad_input[mask] = inputs[mask] - targets[mask]
 
         # Compute gradients outside condition
-        signed_mask = mask.clone().double()
-        signed_mask[signed_mask == 0] = -1
+        signed_mask = torch.empty_like(inputs)
+        signed_mask[(inputs - targets) < 0] = -1
+        signed_mask[(inputs - targets) > 0] = 1
         grad_input[~mask] = ctx.delta * signed_mask[~mask]
 
         # Add to grad output

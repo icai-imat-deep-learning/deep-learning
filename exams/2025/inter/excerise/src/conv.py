@@ -11,11 +11,11 @@ class Conv2d(torch.nn.Module):
     This is the class to implement the Conv2d.
 
     Attributes:
-        weight: weight tensor. Dimensions: [output channels, 
+        weight: weight tensor. Dimensions: [output channels,
             input channels, kernel size, kernel size].
         bias: bias tensor. Dimensions: [output channels].
     """
-    
+
     def __init__(self, in_channels: int, out_channels: int, kernel_size: int) -> None:
         """
         This method is the constructor of Conv2d.
@@ -28,10 +28,10 @@ class Conv2d(torch.nn.Module):
         Returns:
             None.
         """
-        
+
         # Call super class
         super().__init__()
-        
+
         # Set attributes
         self.out_channels = out_channels
         self.in_channels = in_channels
@@ -41,9 +41,7 @@ class Conv2d(torch.nn.Module):
         self.weight = torch.nn.Parameter(
             torch.rand(out_channels, in_channels, kernel_size, kernel_size)
         )
-        self.bias = torch.nn.Parameter(
-            torch.rand(out_channels)
-        )
+        self.bias = torch.nn.Parameter(torch.rand(out_channels))
 
         return None
 
@@ -52,11 +50,11 @@ class Conv2d(torch.nn.Module):
         This method is thf forward pass of the layer.
 
         Args:
-            inputs: Inputs tensor. Dimensions: [batch, input channels, 
+            inputs: Inputs tensor. Dimensions: [batch, input channels,
                 height, width].
 
         Returns:
-            Outputs tensor. Dimensions: [batch, output channels, 
+            Outputs tensor. Dimensions: [batch, output channels,
                 (height - kernel size + 1), (height - kernel size + 1)].
         """
 

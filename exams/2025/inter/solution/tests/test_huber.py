@@ -10,7 +10,7 @@ import pytest
 from src.huber_loss import HuberLoss
 
 
-@pytest.mark.parametrize("delta", [0.5, 1.0])
+@pytest.mark.parametrize("delta", [0.5, 5.0])
 class TestHuberLoss:
     """
     This class implements the tests for the HuberLoss.
@@ -37,7 +37,7 @@ class TestHuberLoss:
 
         # Define modules
         loss: torch.nn.Module = HuberLoss(delta)
-        loss_torch: torch.nn.Module = HuberLoss(delta)
+        loss_torch: torch.nn.Module = torch.nn.HuberLoss("none", delta)
 
         # Compute outputs
         outputs: torch.Tensor = loss(inputs, targets)
@@ -88,7 +88,7 @@ class TestHuberLoss:
 
         # Define modules
         loss: torch.nn.Module = HuberLoss(delta)
-        loss_torch: torch.nn.Module = HuberLoss(delta)
+        loss_torch: torch.nn.Module = torch.nn.HuberLoss("none", delta)
 
         for i in range(2):
             # Set elements to delta in second iteration
