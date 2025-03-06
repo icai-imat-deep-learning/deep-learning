@@ -26,7 +26,10 @@ class ImagenetteDataset(Dataset):
         Constructor of ImagenetteDataset.
 
         Args:
-            path: path of the dataset.
+            path: Path of the dataset.
+
+        Returns:
+            None.
         """
 
         # TODO
@@ -36,7 +39,7 @@ class ImagenetteDataset(Dataset):
         This method returns the length of the dataset.
 
         Returns:
-            length of dataset.
+            Length of dataset.
         """
 
         # TODO
@@ -49,8 +52,8 @@ class ImagenetteDataset(Dataset):
             index: index of the element in the dataset.
 
         Returns:
-            tuple with image and label. Image dimensions:
-                [channels, height, width].
+            Image tensor. Dimensions: [channels, height, width].
+            Label of the image.
         """
 
         # TODO
@@ -64,14 +67,16 @@ def load_imagenette_data(
     other for validation data for imagenette dataset.
 
     Args:
-        path: path of the dataset.
-        color_space: color_space for loading the images.
-        batch_size: batch size for dataloaders. Default value: 128.and
-        num_workers: number of workers for loading data.
+        path: Path of the dataset.
+        color_space: Color_space for loading the images.
+        batch_size: Batch size for dataloaders. Default value: 128.and
+        num_workers: Number of workers for loading data.
             Default value: 0.
 
     Returns:
-        tuple of dataloaders, train, val and test in respective order.
+        Train dataloader.
+        Val dataloader.
+        Test dataloader.
     """
 
     # download folders if they are not present
@@ -107,7 +112,7 @@ def download_data(path: str) -> None:
     This function downloads the data from internet.
 
     Args:
-        path: path to dave the data.
+        path: Path to dave the data.
     """
 
     # define paths
@@ -162,7 +167,7 @@ def parameters_to_double(model: torch.nn.Module) -> None:
     This function transforms the model parameters to double.
 
     Args:
-        model: pytorch model.
+        model: Torch model.
     """
 
     # TODO
@@ -173,8 +178,8 @@ class Accuracy:
     This class is the accuracy object.
 
     Attributes:
-        correct: number of correct predictions.
-        total: number of total examples to classify.
+        correct: Number of correct predictions.
+        total: Number of total examples to classify.
     """
 
     correct: int
@@ -194,9 +199,9 @@ class Accuracy:
         This method update the value of correct and total counts.
 
         Args:
-            logits: outputs of the model.
+            logits: Outputs of the model.
                 Dimensions: [batch, number of classes]
-            labels: labels of the examples. Dimensions: [batch].
+            labels: Labels of the examples. Dimensions: [batch].
         """
 
         # compute predictions
@@ -237,8 +242,8 @@ def save_model(model: torch.nn.Module, name: str) -> None:
     It should create the 'models' if it doesn't already exist.
 
     Args:
-        model: pytorch model.
-        name: name of the model (without the extension, e.g. name.pt).
+        model: Torch model.
+        name: Name of the model (without the extension, e.g. name.pt).
     """
 
     # create folder if it does not exist
@@ -257,10 +262,10 @@ def load_model(name: str) -> RecursiveScriptModule:
     This function is to load a model from the 'models' folder.
 
     Args:
-        name: name of the model to load.
+        name: Name of the model to load.
 
     Returns:
-        model in torchscript.
+        Model in torchscript.
     """
 
     # define model
@@ -274,7 +279,7 @@ def set_seed(seed: int) -> None:
     This function sets a seed and ensure a deterministic behavior.
 
     Args:
-        seed: seed number to fix radomness.
+        seed: Seed number to fix radomness.
     """
 
     # set seed in numpy and random

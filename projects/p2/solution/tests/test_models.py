@@ -47,7 +47,7 @@ def test_relu() -> None:
     inputs_grad_torch: torch.Tensor = inputs.grad.clone()
 
     # check outputs
-    assert (outputs != outputs_torch).sum().item() == 0, "Incorrect forward"
+    assert torch.allclose(outputs, outputs_torch, 1e-8), "Incorrect forward"
 
     # check inputs grads
     assert (
@@ -85,7 +85,7 @@ def test_relu() -> None:
     inputs_grad_torch = inputs.grad.clone()
 
     # check outputs
-    assert (outputs != outputs_torch).sum().item() == 0, "Incorrect forward at 0"
+    assert torch.allclose(outputs, outputs_torch, 1e-8), "Incorrect forward at 0"
 
     # check inputs grads
     assert (
@@ -101,65 +101,68 @@ def test_linear() -> None:
     This function is the test for the linear model.
     """
 
-    # define inputs
-    inputs: torch.Tensor = torch.rand(64, 30).double()
-    inputs.requires_grad_(True)
+    for seed in range(10):
+        # define inputs
+        inputs: torch.Tensor = torch.rand(64, 30).double()
+        inputs.requires_grad_(True)
 
-    # define linear
-    set_seed(42)
-    model: torch.nn.Module = Linear(30, 10)
-    parameters_to_double(model)
+        # define linear
+        set_seed(seed)
+        model: torch.nn.Module = Linear(30, 10)
+        parameters_to_double(model)
 
-    # compute outputs and backward
-    outputs = model(inputs)
-    outputs.sum().backward()
+        # compute outputs and backward
+        outputs = model(inputs)
+        outputs.sum().backward()
 
-    # get grads values
-    if model.weight.grad is None or model.bias.grad is None or inputs.grad is None:
-        assert False, "Gradients not returned, none value detected"
-    grad_weight: torch.Tensor = model.weight.grad.clone()
-    grad_bias: torch.Tensor = model.bias.grad.clone()
-    inputs_grad: torch.Tensor = inputs.grad.clone()
+        # get grads values
+        if model.weight.grad is None or model.bias.grad is None or inputs.grad is None:
+            assert False, "Gradients not returned, none value detected"
+        grad_weight: torch.Tensor = model.weight.grad.clone()
+        grad_bias: torch.Tensor = model.bias.grad.clone()
+        grad_inputs: torch.Tensor = inputs.grad.clone()
 
-    # define torch linear
-    set_seed(42)
-    model_torch = torch.nn.Linear(30, 10)
-    parameters_to_double(model_torch)
+        # define torch linear
+        set_seed(seed)
+        model_torch = torch.nn.Linear(30, 10)
+        parameters_to_double(model_torch)
 
-    # compute outputs and backward
-    outputs_torch = model_torch(inputs)
-    model.zero_grad()
-    inputs.grad.zero_()
-    outputs_torch.sum().backward()
+        # compute outputs and backward
+        outputs_torch = model_torch(inputs)
+        model.zero_grad()
+        inputs.grad.zero_()
+        outputs_torch.sum().backward()
 
-    # get grads values
-    if (
-        model_torch.weight.grad is None
-        or model_torch.bias.grad is None
-        or inputs.grad is None
-    ):
-        assert False, "Gradients not returned, none value detected"
-    grad_weight_torch: torch.Tensor = model_torch.weight.grad.clone()
-    grad_bias_torch: torch.Tensor = model_torch.bias.grad.clone()
-    inputs_grad_torch: torch.Tensor = inputs.grad.clone()
+        # get grads values
+        if (
+            model_torch.weight.grad is None
+            or model_torch.bias.grad is None
+            or inputs.grad is None
+        ):
+            assert False, "Gradients not returned, none value detected"
+        grad_weight_torch: torch.Tensor = model_torch.weight.grad.clone()
+        grad_bias_torch: torch.Tensor = model_torch.bias.grad.clone()
+        grad_inputs_torch: torch.Tensor = inputs.grad.clone()
 
-    # check foward
-    assert (outputs != outputs_torch).sum().item() == 0, "Incorrect forward"
+        # check values of the forward
+        assert torch.allclose(outputs, outputs_torch, 1e-8), "Incorrect forward"
 
-    # check weights grads
-    assert (
-        grad_weight != grad_weight_torch
-    ).sum().item() == 0, "Incorrect weights gradients"
+        # check values of the inputs gradients
+        assert torch.allclose(
+            grad_inputs, grad_inputs_torch, 1e-8
+        ), "Incorrect inputs gradients"
 
-    # check bias grads
-    assert (grad_bias != grad_bias_torch).sum().item() == 0, "Incorrect bias gradients"
+        # check values of the weights gradients
+        assert torch.allclose(
+            grad_weight, grad_weight_torch, 1e-8
+        ), "Incorrect weights gradient"
 
-    # check inputs grads
-    assert (
-        inputs_grad != inputs_grad_torch
-    ).sum().item() == 0, "Incorrect inputs gradients"
+        # check values of the bias gradients
+        assert torch.allclose(
+            grad_bias, grad_bias_torch, 1e-8
+        ), "Incorrect bias gradients"
 
-    return None
+        return None
 
 
 @pytest.mark.order(5)
@@ -168,64 +171,67 @@ def test_conv() -> None:
     This function is the test for the conv model.
     """
 
-    # define inputs
-    inputs: torch.Tensor = torch.rand(64, 3, 32, 32).double()
-    inputs.requires_grad_(True)
+    for seed in range(10):
+        # define inputs
+        inputs: torch.Tensor = torch.rand(64, 3, 32, 32).double()
+        inputs.requires_grad_(True)
 
-    # define conv
-    set_seed(42)
-    model: torch.nn.Module = Conv2d(3, 10, 7)
-    parameters_to_double(model)
+        # define conv
+        set_seed(seed)
+        model: torch.nn.Module = Conv2d(3, 10, 7)
+        parameters_to_double(model)
 
-    # compute outputs and backward
-    outputs = model(inputs)
-    outputs.sum().backward()
+        # compute outputs and backward
+        outputs = model(inputs)
+        outputs.sum().backward()
 
-    # get grads
-    if model.weight.grad is None or model.bias.grad is None or inputs.grad is None:
-        assert False, "Gradients not returned, none value detected"
-    grad_inputs: torch.Tensor = inputs.grad.clone()
-    grad_weight: torch.Tensor = model.weight.grad.clone()
-    grad_bias: torch.Tensor = model.bias.grad.clone()
+        # get grads
+        if model.weight.grad is None or model.bias.grad is None or inputs.grad is None:
+            assert False, "Gradients not returned, none value detected"
+        grad_inputs: torch.Tensor = inputs.grad.clone()
+        grad_weight: torch.Tensor = model.weight.grad.clone()
+        grad_bias: torch.Tensor = model.bias.grad.clone()
 
-    # define conv
-    set_seed(42)
-    model_torch: torch.nn.Module = torch.nn.Conv2d(3, 10, 7)
-    parameters_to_double(model_torch)
+        # define conv
+        set_seed(seed)
+        model_torch: torch.nn.Module = torch.nn.Conv2d(3, 10, 7)
+        parameters_to_double(model_torch)
 
-    # compute outputs and backward
-    outputs_torch = model_torch(inputs)
-    inputs.grad.zero_()
-    outputs_torch.sum().backward()
+        # compute outputs and backward
+        outputs_torch = model_torch(inputs)
+        inputs.grad.zero_()
+        outputs_torch.sum().backward()
 
-    # get grads
-    if (
-        model_torch.weight.grad is None
-        or model_torch.bias.grad is None
-        or inputs.grad is None
-    ):
-        assert False, "Gradients not returned, none value detected"
-    grad_inputs_torch: torch.Tensor = inputs.grad.clone()
-    grad_weight_torch: torch.Tensor = model_torch.weight.grad.clone()
-    grad_bias_torch: torch.Tensor = model_torch.bias.grad.clone()
+        # get grads
+        if (
+            model_torch.weight.grad is None
+            or model_torch.bias.grad is None
+            or inputs.grad is None
+        ):
+            assert False, "Gradients not returned, none value detected"
+        grad_inputs_torch: torch.Tensor = inputs.grad.clone()
+        grad_weight_torch: torch.Tensor = model_torch.weight.grad.clone()
+        grad_bias_torch: torch.Tensor = model_torch.bias.grad.clone()
 
-    # check values of the forward
-    assert (outputs != outputs_torch).sum().item() == 0, "Incorrect forward"
+        # check values of the forward
+        assert torch.allclose(outputs, outputs_torch, 1e-8), "Incorrect forward"
 
-    # check values of the inputs gradients
-    assert (
-        grad_inputs != grad_inputs_torch
-    ).sum().item() == 0, "Incorrect inputs gradients"
+        # check values of the inputs gradients
+        assert torch.allclose(
+            grad_inputs, grad_inputs_torch, 1e-8
+        ), "Incorrect inputs gradients"
 
-    # check values of the weights gradients
-    assert (
-        grad_weight != grad_weight_torch
-    ).sum().item() == 0, "Incorrect weights gradient"
+        # check values of the weights gradients
+        assert torch.allclose(
+            grad_weight, grad_weight_torch, 1e-8
+        ), "Incorrect weights gradient"
 
-    # check values of the bias gradients
-    assert (grad_bias != grad_bias_torch).sum().item() == 0, "Incorrect bias gradients"
+        # check values of the bias gradients
+        assert torch.allclose(
+            grad_bias, grad_bias_torch, 1e-8
+        ), "Incorrect bias gradients"
 
-    return None
+        return None
 
 
 @pytest.mark.order(6)

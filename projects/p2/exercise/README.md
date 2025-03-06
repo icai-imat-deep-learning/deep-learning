@@ -40,11 +40,11 @@ This class is contained in the src.utils module. This class is the dataset to lo
 
 ### ReLUFunction class (0.5 points)
 
-This class is contained in the src.models module. This class implements the forward and backward of the ReLU layer. To implement it you cannot use the nn pytorch module.
+This class is contained in the src.models module. This class implements the forward and backward of the ReLU layer. To implement it you cannot use the nn pytorch module or pytorch custom operations (use only slicing and indexing).
 
 ### LinearFunction class (1 point)
 
-This class is contained in the src.models module. This class implements the forward and backward of the Linear layer. To implement it you cannot use the nn pytorch module.
+This class is contained in the src.models module. This class implements the forward and backward of the Linear layer. To implement it you cannot use the nn pytorch module or pytorch custom operations (use only torch.matmul, slicing and indexing).
 
 ### parameters_to_double function (0.5 points)
 
@@ -88,7 +88,7 @@ To run the checker, the following command must be executed:
 
 It is also available in the pre_commit.sh file, that can be executed as follows:
 
-    source pre_commit.sh
+    source test.sh
 
 The benefit of this second file is that by running the pre_commit your code will also be formatted.
 

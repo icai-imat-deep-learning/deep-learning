@@ -24,7 +24,6 @@ torch.set_num_threads(8)
 
 # static variables
 DATA_PATH: str = "data"
-
 NUMBER_OF_CLASSES: int = 10
 
 

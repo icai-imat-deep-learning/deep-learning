@@ -28,7 +28,7 @@ def main() -> None:
         if os.path.isdir(f"{DATA_PATH}/{file_name}/tests"):
             shutil.rmtree(f"{DATA_PATH}/{file_name}/tests")
         shutil.copytree("tests", f"{DATA_PATH}/{file_name}/tests")
-        
+
         # copy artifacts
         if os.path.isdir(f"{DATA_PATH}/{file_name}/artifacts"):
             shutil.rmtree(f"{DATA_PATH}/{file_name}/artifacts")
