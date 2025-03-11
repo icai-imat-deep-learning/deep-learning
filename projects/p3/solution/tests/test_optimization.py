@@ -1,18 +1,25 @@
-# deep learning libraries
-import torch
+"""
+This module contains the code to test optimization algorithms.
+"""
 
-# other libraries
+# Standard libraries
 import copy
+
+# 3pps
+import torch
 import pytest
 
-# own modules
+# Own modules
 from src.optimization import SGD, SGDMomentum, SGDNesterov, Adam
-from src.utils import set_seed
 
 
 @pytest.mark.order(1)
 @pytest.mark.parametrize("lr, weight_decay", [(1e-3, 0), (1e-4, 1e-2)])
-def test_sgd(lr: float, weight_decay: float) -> None:
+def test_sgd(
+    lr: float,
+    weight_decay: float,
+    artifacts: tuple[torch.Tensor, torch.Tensor, torch.nn.Module],
+) -> None:
     """
     This function is the test for the SGD algorithm.
 
@@ -21,21 +28,15 @@ def test_sgd(lr: float, weight_decay: float) -> None:
         weight_decay: weight decay rate.
     """
 
-    # set seed
-    set_seed(42)
-
-    # define model
-    model_original: torch.nn.Module = torch.nn.Sequential(
-        torch.nn.Linear(30, 10), torch.nn.ReLU(), torch.nn.Linear(10, 1)
-    )
+    # Get artifacts
+    inputs: torch.Tensor
+    targets: torch.Tensor
+    model_original: torch.nn.Module
+    inputs, targets, model_original = artifacts
 
     # clone model
     model1: torch.nn.Module = copy.deepcopy(model_original)
     model2: torch.nn.Module = copy.deepcopy(model_original)
-
-    # define inputs and targets
-    inputs: torch.Tensor = torch.rand(64, 30)
-    targets: torch.Tensor = torch.rand(64, 1)
 
     # define loss and lr
     loss = torch.nn.L1Loss()
@@ -67,10 +68,9 @@ def test_sgd(lr: float, weight_decay: float) -> None:
 
     # check parameters of both models
     for parameter1, parameter2 in zip(model1.parameters(), model2.parameters()):
-        if (
-            parameter1.data.round(decimals=4) != parameter2.data.round(decimals=4)
-        ).sum() != 0:
-            assert False, "Incorrect return of the algorithm"
+        assert torch.allclose(
+            parameter1.data, parameter2.data
+        ), "Incorrect return of the algorithm"
 
     return None
 
@@ -79,7 +79,12 @@ def test_sgd(lr: float, weight_decay: float) -> None:
 @pytest.mark.parametrize(
     "lr, momentum, weight_decay", [(1e-3, 0.9, 0), (1e-4, 0, 1e-2)]
 )
-def test_sgd_momentum(lr: float, momentum: float, weight_decay: float) -> None:
+def test_sgd_momentum(
+    lr: float,
+    momentum: float,
+    weight_decay: float,
+    artifacts: tuple[torch.Tensor, torch.Tensor, torch.nn.Module],
+) -> None:
     """
     This function is the test for the SGD algorithm with momentum.
 
@@ -89,21 +94,15 @@ def test_sgd_momentum(lr: float, momentum: float, weight_decay: float) -> None:
         weight_decay: weight decay rate.
     """
 
-    # set seed
-    set_seed(42)
-
-    # define model
-    model_original: torch.nn.Module = torch.nn.Sequential(
-        torch.nn.Linear(30, 10), torch.nn.ReLU(), torch.nn.Linear(10, 1)
-    )
+    # Get artifacts
+    inputs: torch.Tensor
+    targets: torch.Tensor
+    model_original: torch.nn.Module
+    inputs, targets, model_original = artifacts
 
     # clone model
     model1: torch.nn.Module = copy.deepcopy(model_original)
     model2: torch.nn.Module = copy.deepcopy(model_original)
-
-    # define inputs and targets
-    inputs: torch.Tensor = torch.rand(64, 30)
-    targets: torch.Tensor = torch.rand(64, 1)
 
     # define loss and lr
     loss = torch.nn.L1Loss()
@@ -135,10 +134,9 @@ def test_sgd_momentum(lr: float, momentum: float, weight_decay: float) -> None:
 
     # check parameters of both models
     for parameter1, parameter2 in zip(model1.parameters(), model2.parameters()):
-        if (
-            parameter1.data.round(decimals=4) != parameter2.data.round(decimals=4)
-        ).sum() != 0:
-            assert False, "Incorrect return of the algorithm"
+        assert torch.allclose(
+            parameter1.data, parameter2.data
+        ), "Incorrect return of the algorithm"
 
     return None
 
@@ -147,9 +145,14 @@ def test_sgd_momentum(lr: float, momentum: float, weight_decay: float) -> None:
 @pytest.mark.parametrize(
     "lr, momentum, weight_decay", [(1e-3, 0.9, 0), (1e-4, 0.5, 1e-2)]
 )
-def test_sgd_nesterov(lr: float, momentum: float, weight_decay: float) -> None:
+def test_sgd_nesterov(
+    lr: float,
+    momentum: float,
+    weight_decay: float,
+    artifacts: tuple[torch.Tensor, torch.Tensor, torch.nn.Module],
+) -> None:
     """
-    This function is the test for the SGD algorithm with nesterov
+    This function is the test for the SGD algorithm with nesterov.
     momentum.
 
     Args:
@@ -157,21 +160,16 @@ def test_sgd_nesterov(lr: float, momentum: float, weight_decay: float) -> None:
         momentum: momentum rate.
         weight_decay: weight decay rate.
     """
-    # set seed
-    set_seed(42)
 
-    # define model
-    model_original: torch.nn.Module = torch.nn.Sequential(
-        torch.nn.Linear(30, 10), torch.nn.ReLU(), torch.nn.Linear(10, 1)
-    )
+    # Get artifacts
+    inputs: torch.Tensor
+    targets: torch.Tensor
+    model_original: torch.nn.Module
+    inputs, targets, model_original = artifacts
 
     # clone model
     model1: torch.nn.Module = copy.deepcopy(model_original)
     model2: torch.nn.Module = copy.deepcopy(model_original)
-
-    # define inputs and targets
-    inputs: torch.Tensor = torch.rand(64, 30)
-    targets: torch.Tensor = torch.rand(64, 1)
 
     # define loss and lr
     loss = torch.nn.L1Loss()
@@ -207,10 +205,9 @@ def test_sgd_nesterov(lr: float, momentum: float, weight_decay: float) -> None:
 
     # check parameters of both models
     for parameter1, parameter2 in zip(model1.parameters(), model2.parameters()):
-        if (
-            parameter1.data.round(decimals=4) != parameter2.data.round(decimals=4)
-        ).sum() != 0:
-            assert False, "Incorrect return of the algorithm"
+        assert torch.allclose(
+            parameter1.data, parameter2.data
+        ), "Incorrect return of the algorithm"
 
     return None
 
@@ -219,7 +216,12 @@ def test_sgd_nesterov(lr: float, momentum: float, weight_decay: float) -> None:
 @pytest.mark.parametrize(
     "lr, betas, weight_decay", [(1e-3, (0.9, 0.999), 0), (1e-4, (0.5, 0.4), 1e-2)]
 )
-def test_adam(lr: float, betas: tuple[float, float], weight_decay: float) -> None:
+def test_adam(
+    lr: float,
+    betas: tuple[float, float],
+    weight_decay: float,
+    artifacts: tuple[torch.Tensor, torch.Tensor, torch.nn.Module],
+) -> None:
     """
     This function is the test for the SGD algorithm with nesterov
     momentum.
@@ -230,21 +232,15 @@ def test_adam(lr: float, betas: tuple[float, float], weight_decay: float) -> Non
         weight_decay: weight decay rate.
     """
 
-    # set seed
-    set_seed(42)
-
-    # define model
-    model_original: torch.nn.Module = torch.nn.Sequential(
-        torch.nn.Linear(30, 10), torch.nn.ReLU(), torch.nn.Linear(10, 1)
-    )
+    # Get artifacts
+    inputs: torch.Tensor
+    targets: torch.Tensor
+    model_original: torch.nn.Module
+    inputs, targets, model_original = artifacts
 
     # clone model
     model1: torch.nn.Module = copy.deepcopy(model_original)
     model2: torch.nn.Module = copy.deepcopy(model_original)
-
-    # define inputs and targets
-    inputs: torch.Tensor = torch.rand(64, 30)
-    targets: torch.Tensor = torch.rand(64, 1)
 
     # define loss and lr
     loss = torch.nn.L1Loss()
@@ -276,9 +272,8 @@ def test_adam(lr: float, betas: tuple[float, float], weight_decay: float) -> Non
 
     # check parameters of both models
     for parameter1, parameter2 in zip(model1.parameters(), model2.parameters()):
-        if (
-            parameter1.data.round(decimals=2) != parameter2.data.round(decimals=2)
-        ).sum() != 0:
-            assert False, "Incorrect return of the algorithm"
+        assert torch.allclose(
+            parameter1.data, parameter2.data
+        ), "Incorrect return of the algorithm"
 
     return None

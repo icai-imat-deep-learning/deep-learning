@@ -1,26 +1,32 @@
-# deep learning libraries
+"""
+This module contains auxiliary functionality for the rest of the 
+modules.
+"""
+
+# Standard libraries
+import os
+import random
+from typing import Optional
+
+# 3pps
 import torch
 import numpy as np
 import torch.nn.functional as F
 from torch.jit import RecursiveScriptModule
 
-# other libraries
-import os
-import random
-from typing import Optional
-
 
 class StepLR(torch.optim.lr_scheduler.LRScheduler):
     """
-    This
+    This class implements the StepLR.
 
-    Attr:
+    Attributes:
         optimizer: optimizer that the scheduler is using.
         step_size: number of steps to decrease learning rate.
         gamma: factor to decrease learning rate.
         count: count of steps.
     """
 
+    # Define attributes
     optimizer: torch.optim.Optimizer
     step_size: int
     gamma: float
@@ -43,6 +49,7 @@ class StepLR(torch.optim.lr_scheduler.LRScheduler):
             gamma: factor to change the lr. Defaults to 0.1.
         """
 
+        # Set attributes
         self.optimizer = optimizer
         self.step_size = step_size
         self.gamma = gamma

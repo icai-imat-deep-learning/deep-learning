@@ -1,7 +1,9 @@
-# deep learning libraries
-import torch
+"""
+This module contains the code to test the models module.
+"""
 
-# other libraries
+# 3pps
+import torch
 import pytest
 
 # own modules
@@ -10,23 +12,37 @@ from src.models import Dropout
 
 
 @pytest.mark.order(6)
-def test_dropout() -> None:
+@pytest.mark.parametrize("p, seed", [(0.0, 0), (0.5, 1), (0.7, 2)])
+def test_dropout(
+    p: float, seed: int, artifacts: tuple[torch.Tensor, torch.Tensor, torch.nn.Module]
+) -> None:
+    """
+    This function tests the Dropout layer.
+
+    Args:
+        p: dropout probability.
+        seed: seed for test.
+
+    Returns:
+        None.
+    """
+
     # define inputs
-    inputs: torch.Tensor = torch.rand(64, 30)
+    inputs: torch.Tensor = artifacts[0]
     inputs_torch: torch.Tensor = inputs.clone()
 
     # define dropout
-    dropout = Dropout(0.5)
-    dropout_torch: torch.nn.Module = torch.nn.Dropout(0.5)
+    dropout = Dropout(p)
+    dropout_torch: torch.nn.Module = torch.nn.Dropout(p)
 
     # activate train mode
     dropout.train()
     dropout_torch.train()
 
     # compute outputs
-    set_seed(42)
+    set_seed(seed)
     outputs: torch.Tensor = dropout(inputs)
-    set_seed(42)
+    set_seed(seed)
     outputs_torch: torch.Tensor = dropout_torch(inputs)
 
     # check output type
@@ -40,7 +56,7 @@ def test_dropout() -> None:
     ), f"Incorrect shape, expected {inputs.shape}, got {outputs.shape}"
 
     # check outputs of dropout
-    assert (outputs != outputs_torch).sum().item() == 0, (
+    assert torch.allclose(outputs, outputs_torch), (
         "Incorrect outputs when train mode activated, outputs are not equal to "
         "pytorch implementation"
     )
@@ -49,30 +65,30 @@ def test_dropout() -> None:
     dropout.eval()
     dropout_torch.eval()
 
-    # compute outputs
-    set_seed(42)
+    # Compute outputs
+    set_seed(seed)
     outputs = dropout(inputs)
-    set_seed(42)
+    set_seed(seed)
     outputs_torch = dropout_torch(inputs)
 
     # check outputs of dropout
-    assert (outputs != outputs_torch).sum().item() == 0, (
+    assert torch.allclose(outputs, outputs_torch), (
         "Incorrect outputs when eval mode activated, outputs are not equal to "
         "pytorch implementation"
     )
 
     # define dropout with inplace
-    dropout = Dropout(0.5, inplace=True)
-    dropout_torch = torch.nn.Dropout(0.5, inplace=True)
+    dropout = Dropout(p, inplace=True)
+    dropout_torch = torch.nn.Dropout(p, inplace=True)
 
     # compute outputs
-    set_seed(42)
+    set_seed(seed)
     dropout(inputs)
-    set_seed(42)
+    set_seed(seed)
     dropout_torch(inputs_torch)
 
     # check outputs of dropout
-    assert (inputs != inputs_torch).sum().item() == 0, (
+    assert torch.allclose(inputs, inputs_torch), (
         "Incorrect outputs when inplace is activated, outputs are not equal to "
         "pytorch implementation"
     )

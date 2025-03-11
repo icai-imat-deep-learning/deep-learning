@@ -1,8 +1,12 @@
-# deep learning libraries
-import torch
+"""
+This module contains the code to implement optimizers.
+"""
 
-# other libraries
+# Standard libraries
 from typing import Iterator, Dict, Any, DefaultDict
+
+# 3pps
+import torch
 
 
 class SGD(torch.optim.Optimizer):

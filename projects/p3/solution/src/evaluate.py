@@ -1,8 +1,12 @@
-# deep learning libraries
+"""
+This module contains the code to evaluate the models.
+"""
+
+# 3pps
 import torch
 from torch.jit import RecursiveScriptModule
 
-# own modules
+# Own modules
 from src.data import load_data
 from src.utils import (
     Accuracy,
@@ -10,12 +14,12 @@ from src.utils import (
     set_seed,
 )
 
-# set device
+# Set device
 device: torch.device = (
     torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 )
 
-# set all seeds and set number of threads
+# Set all seeds and set number of threads
 set_seed(42)
 torch.set_num_threads(8)
 

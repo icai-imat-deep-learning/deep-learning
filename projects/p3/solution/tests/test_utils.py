@@ -1,9 +1,13 @@
-# deep learning libraries
+"""
+This module contains the code to test the utils functions.
+"""
+
+# Standard libraries
+import copy
+
+# 3pps
 import torch
 from torch.optim.lr_scheduler import LRScheduler
-
-# other libraries
-import copy
 import pytest
 
 # own modules

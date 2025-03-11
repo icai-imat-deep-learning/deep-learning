@@ -74,7 +74,7 @@ Following the coding guidelines is important since it allows the development of 
 
 To run the checker, the following command must be executed:
 
-    mypy --cache-dir=/dev/null --check-untyped-defs --ignore-missing-imports .
+    mypy .
 
 It is also available in the test.sh file, that can be executed as follows:
 
@@ -88,7 +88,7 @@ The code must follow the PEP-8 standard.
 
 To run the checker the following command must be executed:
 
-    flake8 --max-line-length 89
+    flake8 .
 
 It is also available in the test.sh file, that can be executed as follows:
 

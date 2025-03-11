@@ -1,4 +1,4 @@
-# deep learning libraries
+# 3pps
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 from torchvision import transforms
@@ -59,9 +59,9 @@ class ImagenetteDataset(Dataset):
         # load image
         transformations = transforms.Compose([transforms.ToTensor()])
         image = Image.open(image_path)
-        image = transformations(image)
+        image_tensor = transformations(image)
 
-        return image, label
+        return image_tensor, label
 
 
 def load_data(

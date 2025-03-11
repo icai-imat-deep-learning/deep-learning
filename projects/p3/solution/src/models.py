@@ -1,4 +1,8 @@
-# deep learning libraries
+"""
+This module contains the code of the models.
+"""
+
+# 3pps
 import torch
 
 # own modules

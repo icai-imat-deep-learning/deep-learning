@@ -1,12 +1,14 @@
-# deep learning libraries
+"""
+This module contains the code to train the model.
+"""
+
+# 3pps
 import torch
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
-
-# other libraries
 from tqdm.auto import tqdm
 
-# own modules
+# Own modules
 from src.models import CNNModel
 from src.data import load_data
 from src.utils import (
