@@ -48,9 +48,7 @@ def test_rnn_forward() -> None:
     ), f"Incorrect outputs shape, expected {outputs_torch.shape}, got {outputs.shape}"
 
     # check outputs of dropout
-    assert (
-        outputs.round(decimals=2) != outputs_torch.round(decimals=2)
-    ).sum().item() == 0, "Incorrect outputs in forward"
+    assert torch.allclose(outputs, outputs_torch), "Incorrect outputs in forward"
 
     return None
 
@@ -121,45 +119,35 @@ def test_rnn_backward() -> None:
     bias_hh_grad_torch: torch.Tensor = model.bias_hh.grad.clone()
 
     # check input grads of last hidden state
-    assert (
-        inputs_grad[:, -1, :].round(decimals=2)
-        != inputs_grad_torch[:, -1, :].round(decimals=2)
-    ).sum().item() == 0, "Incorrect grad inputs in last hidden state"
+    assert torch.allclose(
+        inputs_grad[:, -1, :], inputs_grad_torch[:, -1, :]
+    ), "Incorrect grad inputs in last hidden state"
 
     # check input grads of last - 1 hidden state
-    assert (
-        inputs_grad[:, -2, :].round(decimals=2)
-        != inputs_grad_torch[:, -2, :].round(decimals=2)
-    ).sum().item() == 0, "Incorrect grad inputs in last - 1 hidden state"
+    assert torch.allclose(
+        inputs_grad[:, -2, :], inputs_grad_torch[:, -2, :]
+    ), "Incorrect grad inputs in last - 1 hidden state"
 
     # check all inputs grads
-    assert (
-        inputs_grad.round(decimals=2) != inputs_grad_torch.round(decimals=2)
-    ).sum().item() == 0, "Incorrect grad inputs"
+    assert torch.allclose(inputs_grad, inputs_grad_torch), "Incorrect grad inputs"
 
     # check h0 grads
-    assert (
-        h0_grad.round(decimals=2) != h0_grad_torch.round(decimals=2)
-    ).sum().item() == 0, "Incorrect grad h0"
+    assert torch.allclose(h0_grad, h0_grad_torch), "Incorrect grad h0"
 
     # check weight_ih grads
-    assert (
-        weight_ih_grad.round(decimals=4) != weight_ih_grad_torch.round(decimals=4)
-    ).sum().item() == 0, "Incorrect grad weight_ih"
+    assert torch.allclose(
+        weight_ih_grad, weight_ih_grad_torch
+    ), "Incorrect grad weight_ih"
 
     # check weight_hh grads
-    assert (
-        weight_hh_grad.round(decimals=4) != weight_hh_grad_torch.round(decimals=4)
-    ).sum().item() == 0, "Incorrect grad weight_hh"
+    assert torch.allclose(
+        weight_hh_grad, weight_hh_grad_torch
+    ), "Incorrect grad weight_hh"
 
     # check bias_ih
-    assert (
-        bias_ih_grad.round(decimals=4) != bias_ih_grad_torch.round(decimals=4)
-    ).sum().item() == 0, "Incorrect grad bias_ih"
+    assert torch.allclose(bias_ih_grad, bias_ih_grad_torch), "Incorrect grad bias_ih"
 
     # check bias_hh
-    assert (
-        bias_hh_grad.round(decimals=4) != bias_hh_grad_torch.round(decimals=4)
-    ).sum().item() == 0, "Incorrect grad bias_hh"
+    assert torch.allclose(bias_hh_grad, bias_hh_grad_torch), "Incorrect grad bias_hh"
 
     return None
