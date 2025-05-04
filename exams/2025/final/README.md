@@ -17,7 +17,7 @@ You cannot use any class or function from torch.nn module, and operations must b
 
 ## BatchNorm2d (5 points)
 
-Here you will have to code the forward and backward of custom version of the BatchNorm2d. To avoid having to code gradients of the Standard Deviation, you will only code the eval version, which means that you will use the running mean and var, instead of taking them from each batch. The formula of the custom version is the following:
+Here you will have to code the forward and backward of custom version of the BatchNorm2d. You will only code the eval version, which means that you will use the running mean and var, instead of taking them from each batch. The formula of the custom version is the following:
 
 ```math
 y = \frac{LeakyReLU(x - E(x))}{\sigma^2(x) + \epsilon}
