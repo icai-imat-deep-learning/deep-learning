@@ -4,6 +4,27 @@ This is the final exam of 2025. For this exam you are only allowed to use pytorc
 
 Moreover, for this exam you cannot use any class or function from torch.nn module, and operations must be done with indexing (e.g. torch.where is not allowed).
 
+## BatchNorm2d (5 points)
+
+Here you will have to code the forward and backward of custom version of the BatchNorm2d. To avoid having to code gradients of the Standard Deviation, you will only code the eval version, which means that you will use the running mean and var, instead of taking them from each batch. The formula of the custom version is the following:
+
+```math
+y = \frac{LeakyReLU(x - E)}{Var + eps}
+```
+
+As you can check, there is also a second addition, you will have to introduce a LeakyReLU after subtracting the mean. Remember that you cannot use any function from the nn package, so you will have to code the LeakyReLU yourself using masks.
+
+To make it simpler, in this version we have ignored the affine transformations (gamma and beta parameters) so you must ignore them.
+
+### Forward (2 points)
+
+Here you will have to code the forward method.
+
+### Backward (3 points)
+
+Here you will have to code the backward method.
+
+
 ## MaxOut (5 points)
 
 You have to code MaxOut layer in pytorch for a generic number of units. For this implementation you cannot use loops, so everything has to be vectorized operations. You have the formula and diagram of the MaxOut in the artifacts folder. Therefore, we will use the [batch matrix multiplication](https://pytorch.org/docs/stable/generated/torch.bmm.html) (BMM). We advice to have a look at it, since understanding the formula and shapes is a key step to complete the exercise. In this case you have to complete the following functions:
