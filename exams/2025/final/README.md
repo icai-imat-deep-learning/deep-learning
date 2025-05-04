@@ -27,11 +27,11 @@ As you can check, there is also a second addition, you will have to introduce a 
 
 To make it simpler, in this version we have ignored the affine transformations (gamma and beta parameters) so you must ignore them.
 
-### Forward (2 points)
+### `forward` (2 points)
 
 Here you will have to code the forward method.
 
-### Backward (3 points)
+### `backward` (3 points)
 
 Here you will have to code the backward method.
 
