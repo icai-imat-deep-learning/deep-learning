@@ -27,7 +27,7 @@ Here you will have to define the constructor and the objects that will be used i
 
 This method reshapes the inputs in a way they can be used in the BMM. For this function the target shape is provided in the docstring of the function. A test is available to check the functionality of the method. 
 
-Hint: Take into account that for the reshaping you may need to use repetitions (such as [`torch.repeat_interleave()`](https://pytorch.org/docs/stable/generated/torch.repeat_interleave.html) and other functions, and not only `.view()` operations.
+Hint: Take into account that for the reshaping you may need to use repetitions (such as [`torch.repeat_interleave()`](https://pytorch.org/docs/stable/generated/torch.repeat_interleave.html)) and other functions, and not only `.view()` operations.
 
 ### `reshape_weight` (2 points)
 
