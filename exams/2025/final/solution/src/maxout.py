@@ -1,5 +1,5 @@
 """
-This module contains the code for Maxout.
+This module contains the code for MaxOut.
 """
 
 # 3pps
@@ -24,6 +24,9 @@ class MaxOut(torch.nn.Module):
     def __init__(self, num_units: int, input_dim: int, output_dim: int) -> None:
         """
         This method is the constructor of the class.
+        
+        Returns:
+            None.
         """
 
         # Call super class
@@ -51,7 +54,7 @@ class MaxOut(torch.nn.Module):
         """
 
         # Repeat inputs
-        inputs = inputs.view(inputs.shape[0], 1, 1, inputs.shape[1])
+        inputs = inputs.view(inputs.shape[0], 1, 1, inputs.shape[1]).clone()
         inputs = inputs.repeat(1, self.num_units, 1, 1)
         inputs = inputs.view(-1, *inputs.shape[2:])
 
@@ -70,7 +73,7 @@ class MaxOut(torch.nn.Module):
         """
 
         # Get weight
-        weight = self.weight.view(1, *self.weight.shape)
+        weight: torch.Tensor = self.weight.view(1, *self.weight.shape).clone()
         weight = weight.repeat(inputs.shape[0], 1, 1, 1)
         weight = weight.view(-1, *weight.shape[2:])
         weight = weight.transpose(1, 2)

@@ -22,7 +22,7 @@ Here you will have to code the forward and backward of custom version of the Bat
 ```math
 y = \frac{LeakyReLU(x - E(x))}{\sigma^2(x) + \epsilon}
 ```
-where ```math E(x)``` is the running mean and ```math \sigma^2(x)``` is the running variance.
+where $E(x)$ is the running mean and $\sigma^2(x)$ is the running variance.
 
 As you can check, there is also a second addition, you will have to introduce a LeakyReLU after subtracting the mean. Remember that you cannot use any function from the nn package, so you will have to code the LeakyReLU yourself using masks.
 
@@ -49,13 +49,13 @@ Here you will have to define the constructor and the objects that will be used i
 
 This method reshapes the inputs in a way they can be used in the BMM. For this function the target shape is provided in the docstring of the function. A test is available to check the functionality of the method. 
 
-Hint: Take into account that for the reshaping you may need to use repetitions (such as [`torch.repeat_interleave()`](https://pytorch.org/docs/stable/generated/torch.repeat_interleave.html)) and other functions, and not only `.view()` operations.
+Hint: Take into account that for the reshaping you may need to use repetitions (such as [`Tensor.repeat()`](https://pytorch.org/docs/stable/generated/torch.Tensor.repeat.html)) and other functions, and not only `.view()` operations.
 
 ### `reshape_weight` (2.5 points)
 
 This method reshapes the weight tensor created in the init method in a way that it can be used in the BMM. For this function the target shape is not provided and there is not an available test. You can figure out if the implementation is correct in the test for the `forward` pass. 
 
-Hint: Take into account that for the reshaping you may have to use repetitions and other functions, and not only `.view()` operations.
+Hint: Take into account that for the reshaping you may need to use repetitions (such as [`Tensor.repeat()`](https://pytorch.org/docs/stable/generated/torch.Tensor.repeat.html)) and other functions, and not only `.view()` operations.
 
 ### `forward` (2 points)
 
