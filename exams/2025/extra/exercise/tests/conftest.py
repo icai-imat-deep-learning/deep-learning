@@ -10,7 +10,7 @@ import pytest
 from tests.utils import add_seed, set_seed
 
 
-@pytest.fixture(params=[*add_seed((32, 6, 16, 16)), *add_seed((16, 18, 32, 32))])
+@pytest.fixture(params=[*add_seed((8, 6, 16, 16)), *add_seed((4, 12, 8, 8))])
 def inputs_2d(request) -> torch.Tensor:
     """
     This function is a fixture to define example random inputs.

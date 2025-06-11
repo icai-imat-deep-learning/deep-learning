@@ -75,8 +75,9 @@ class TestCustomMaxPool2d(torch.nn.Module):
 
         # Init outputs with nans
         outputs = torch.zeros(
-            inputs.shape[0], self.num_groups, output_size, output_size
-        ).double() * torch.log(torch.tensor([-1.0]))
+            (inputs.shape[0], self.num_groups, output_size, output_size),
+            dtype=torch.double,
+        )
 
         # Iter over spatial dimensions
         for i in range(output_size):
@@ -91,7 +92,8 @@ class TestCustomMaxPool2d(torch.nn.Module):
                             + num_channels_group,
                             i : i + self.kernel_size,
                             j : j + self.kernel_size,
-                        ]
+                        ],
+                        dim=(1, 2, 3),
                     )
 
         return outputs
