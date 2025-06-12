@@ -15,19 +15,19 @@ Welcome to the **Final Exam of 2025**!
 
 You cannot use any class or function from torch.nn module, and operations must be done with indexing (e.g. `torch.where` is not allowed). When in doubt if a function is allowed, ask your teacher!
 
-# Conv1d (3 points)
+# Conv1d (4 points)
 
 In this exercise you will have to implement the Conv1d without any functions of the nn package. Here you cannot use `fold` nor `unfold` either. You are allowed to use only 1 `for` loop in each method (1 for the `forward` and 1 for the `backward`). This loop is only allowed in a spatial dimension, the last dimension of the inputs or outputs (you should choose in which one). This `Conv1d` must not have any bias.
 
-### `forward` (1 point)
+### `forward` (1.5 point)
 
 Here you will have to code the forward method. Use only 1 `for` loop in a spatial dimension (last dimension of inputs or outputs).
 
-### `backward` (2 points)
+### `backward` (2.5 points)
 
 Here you will have to code the backward method. Use only 1 `for` loop in a spatial dimension (last dimension of inputs or outputs).
 
-## Custom MaxPool2d (7 points)
+## Custom MaxPool2d (6 points)
 
 Here you will have to implement a custom MaxPool2d without using loops. First, let's explain the custom MaxPool2d operation. Usually, MaxPool2d is computed without any depth, that means that the output always has the same number of channels that the input. However, here we want to merge the concept of groups with the MaxPool2d. Therefore, now the max operation will be computed from all the channels in the same group.
 
@@ -54,11 +54,11 @@ You will have to implement this without using any loops or any function from the
 
 You should not worry about stride, dilation or padding.
 
-### `forward` (2.5 points)
+### `forward` (2 points)
 
 Here you will have to code the forward method.
 
-### `backward` (4.5 points)
+### `backward` (4 points)
 
 Here you will have to code the backward method.
 
