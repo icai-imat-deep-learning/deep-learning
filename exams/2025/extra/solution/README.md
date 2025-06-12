@@ -27,7 +27,7 @@ Here you will have to code the forward method. Use only 1 `for` loop in a spatia
 
 Here you will have to code the backward method. Use only 1 `for` loop in a spatial dimension (last dimension of inputs or outputs).
 
-## Custom MaxPool2d (6 points)
+## Grouped MaxPool2d (6 points)
 
 Here you will have to implement a custom MaxPool2d without using loops. First, let's explain the custom MaxPool2d operation. Usually, MaxPool2d is computed without any depth, that means that the output always has the same number of channels that the input. However, here we want to merge the concept of groups with the MaxPool2d. Therefore, now the max operation will be computed from all the channels in the same group.
 
