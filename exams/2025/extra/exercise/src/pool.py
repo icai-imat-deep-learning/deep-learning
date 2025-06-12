@@ -28,33 +28,7 @@ class CustomMaxPool2dFunction(torch.autograd.Function):
                 width], same as inputs.
         """
 
-        # Compute output size
-        output_size: int = inputs.shape[2] - kernel_size + 1
-
-        # Compute number of channels per groups
-        num_channels_group: int = inputs.shape[1] // num_groups
-
-        # Transform dimensions
-        outputs: torch.Tensor = inputs.clone().view(
-            -1, num_channels_group, *inputs.shape[2:]
-        )
-
-        # Apply unfold
-        outputs = F.unfold(outputs, kernel_size=kernel_size)
-
-        # Get the maximum
-        outputs, indexes = torch.max(outputs, dim=1, keepdim=True)
-
-        # Fold
-        outputs = F.fold(outputs, output_size=output_size, kernel_size=1)
-        outputs = outputs.view(-1, num_groups, output_size, output_size)
-
-        # Save for backward
-        ctx.save_for_backward(
-            inputs, indexes, torch.tensor(kernel_size), torch.tensor(num_channels_group)
-        )
-
-        return outputs
+        # TODO
 
     @staticmethod
     def backward(  # type: ignore
@@ -71,36 +45,7 @@ class CustomMaxPool2dFunction(torch.autograd.Function):
             _description_
         """
 
-        # Get tensors from forward
-        inputs, indexes, kernel_size, num_channels_group = ctx.saved_tensors
-
-        # Define grad inputs
-        grad_inputs: torch.Tensor = torch.zeros_like(inputs)
-        grad_inputs = grad_inputs.view(
-            -1, num_channels_group.item(), *grad_inputs.shape[2:]
-        )
-
-        # Unfold
-        grad_inputs = F.unfold(grad_inputs, kernel_size=kernel_size.item())
-
-        # Assign grads based on indexes
-        mask: torch.Tensor = torch.permute(
-            F.one_hot(indexes, num_classes=grad_inputs.shape[1]).squeeze(1), (0, 2, 1)
-        )
-        grad_inputs[mask == 1] = 1
-
-        # Add grad outputs
-        grad_inputs = grad_inputs * F.unfold(grad_outputs, kernel_size=1).view(
-            grad_inputs.shape[0], 1, -1
-        )
-
-        # Fold
-        grad_inputs = F.fold(
-            grad_inputs, output_size=inputs.shape[2], kernel_size=kernel_size.item()
-        )
-        grad_inputs = grad_inputs.view(*inputs.shape)
-
-        return grad_inputs, None, None
+        # TODO
 
 
 class CustomMaxPool2d(torch.nn.Module):
