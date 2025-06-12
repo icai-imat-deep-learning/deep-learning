@@ -2,9 +2,6 @@
 This module contains the code to test the Conv1d.
 """
 
-# Standard libraries
-
-
 # 3pps
 import torch
 import pytest
@@ -15,6 +12,10 @@ from src.conv1d import Conv1d
 
 @pytest.mark.parametrize("out_channels, kernel_size", [(10, 3), (5, 5)])
 class TestConv1d:
+    """
+    This class implements the tests for the Conv1d.
+    """
+
     @torch.no_grad()
     def test_forward(
         self,
@@ -22,6 +23,19 @@ class TestConv1d:
         kernel_size: int,
         inputs_1d: torch.Tensor,
     ) -> None:
+        """
+        This method is the test for the forward method.
+
+        Args:
+            out_channels: Output channels.
+            kernel_size: Kernel size.
+            inputs_1d: Inputs fixture. Dimensions: [batch size,
+                number of input channels, sequence length].
+
+        Returns:
+            None.
+        """
+
         # Rename fixture
         inputs: torch.Tensor = inputs_1d
 
@@ -30,7 +44,7 @@ class TestConv1d:
         module_test: torch.nn.Module = torch.nn.Conv1d(
             inputs.shape[1], out_channels, kernel_size, bias=False, dtype=torch.double
         )
-        module_test.weight = module.kernel
+        module_test.weight = module.weight
 
         # Compute outputs
         outputs: torch.Tensor = module(inputs)
@@ -62,7 +76,7 @@ class TestConv1d:
             num_groups: Number of groups.
             use_grad_outputs: Indicator to use grad outputs.
             inputs_1d: Inputs fixture. Dimensions: [batch size,
-                number of channels, height, width].
+                number of channels, sequence length].
 
         Raises:
             RuntimeError: Error in gradient computation.
@@ -81,7 +95,7 @@ class TestConv1d:
             inputs.shape[1], out_channels, kernel_size, bias=False, dtype=torch.double
         )
         with torch.no_grad():
-            module_test.weight = module.kernel
+            module_test.weight = module.weight
 
         # Compute outputs and weights
         outputs: torch.Tensor = module(inputs)
@@ -93,20 +107,29 @@ class TestConv1d:
 
         # Compute gradients
         (outputs * weights).sum().backward()
-        if inputs.grad is None:
+        if (inputs.grad is None) or (module.weight.grad is None):
             raise RuntimeError("Error in gradient computation")
-        gradients: torch.Tensor = inputs.grad.clone()
+        gradients_inputs: torch.Tensor = inputs.grad.clone()
+        gradients_weight: torch.Tensor = module.weight.grad
         inputs.grad.zero_()
 
         # Compute torch gradients
         outputs = module_test(inputs)
         (outputs * weights).sum().backward()
-        if inputs.grad is None:
+        if (inputs.grad is None) or (module.weight.grad is None):
             raise RuntimeError("Error in gradient computation")
-        gradients_test: torch.Tensor = inputs.grad.clone()
+        gradients_inputs_test: torch.Tensor = inputs.grad.clone()
+        gradients_weight_test: torch.Tensor = module.weight.grad
         inputs.grad.zero_()
 
-        # Check values
-        assert torch.allclose(gradients, gradients_test)
+        # Check gradients inputs values
+        assert torch.allclose(
+            gradients_inputs, gradients_inputs_test
+        ), "Incorrect gradients value for inputs"
+
+        # Check gradients weight values
+        assert torch.allclose(
+            gradients_weight, gradients_weight_test
+        ), "Incorrect gradients value for weight"
 
         return None

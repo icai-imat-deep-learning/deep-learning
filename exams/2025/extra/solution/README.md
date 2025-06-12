@@ -19,15 +19,15 @@ You cannot use any class or function from torch.nn module, and operations must b
 
 In this exercise you will have to implement the Conv1d without any functions of the nn package. Here you cannot use fold and unfold either. You are allowed to use only 1 for loop for each method (1 for the forward and 1 for the backward). This loop is only allowed in the spatial dimension, the last dimension of the inputs or outputs. This Conv1d does not have any bias.
 
-### `forward` (1 point)
+### `forward` (1.5 point)
 
 Here you will have to code the forward method.
 
-### `backward` (2 points)
+### `backward` (2.5 points)
 
 Here you will have to code the backward method.
 
-## Custom MaxPool2d (7 points)
+## Custom MaxPool2d (6 points)
 
 Here you will have to implement a custom MaxPool2d without using loops. First, let's explain the custom MaxPool2d operation. Usually, MaxPool2d is computed without any depth, that means that the output always has the same number of channels that the input. However, here we want to merge the concept of groups with the MaxPool2d. Therefore, now the max operation will be computed from all the channels in the same group.
 
