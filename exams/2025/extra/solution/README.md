@@ -37,12 +37,12 @@ Inputs: [batch size, channels, height, width]
 Outputs: [batch size, channels, height - kernel size + 1, width - kernel size + 1].
 ```
 
-- Custom MaxPool2d with 1 group:
+- Grouped MaxPool2d with 1 group:
 ```
 Inputs: [batch size, channels, height, width]
 Outputs: [batch size, 1, height - kernel size + 1, width - kernel size + 1].
 ```
-- Custom MaxPool2d with n groups:
+- Grouped MaxPool2d with n groups:
 ```
 Inputs: [batch size, channels, height, width]
 Outputs: [batch size, n, height - kernel size + 1, width - kernel size + 1].
