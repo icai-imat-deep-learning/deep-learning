@@ -24,8 +24,9 @@ class CustomMaxPool2dFunction(torch.autograd.Function):
                 height, width].
 
         Returns:
-            Outputs tensor. Dimensions: [batch, channels, height,
-                width], same as inputs.
+            Outputs tensor. Dimensions: [batch, number of groups,
+                height - kernel size + 1,
+                width - kernel size + 1].
         """
 
         # Compute output size
@@ -61,14 +62,18 @@ class CustomMaxPool2dFunction(torch.autograd.Function):
         ctx, grad_outputs: torch.Tensor
     ) -> tuple[torch.Tensor, None, None]:
         """
-        _summary_
+        This method implements the backward pass of the layer.
 
         Args:
             grad_outputs: Outputs gradients. Dimensions: [batch size,
-                number of channels]
+                number of groups, height - kernel size + 1,
+                width - kernel size + 1].
 
         Returns:
-            _description_
+            Gradients of the inputs. Dimensions: [batch size,
+                number of channels, height, width].
+            None.
+            None.
         """
 
         # Get tensors from forward
@@ -109,8 +114,8 @@ class CustomMaxPool2d(torch.nn.Module):
         This method is the constructor of the class.
 
         Args:
-            kernel_size: _description_
-            num_groups: _description_
+            kernel_size: Kernel size.
+            num_groups: Number of groups.
 
         Returns:
             None.
@@ -128,7 +133,7 @@ class CustomMaxPool2d(torch.nn.Module):
 
         return None
 
-    def forward(self, inputs: torch.Tensor) -> None:
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
         This method is the forward pass of the layer.
 

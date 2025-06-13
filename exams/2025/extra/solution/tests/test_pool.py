@@ -13,10 +13,27 @@ from tests.utils import TestCustomMaxPool2d
 
 @pytest.mark.parametrize("kernel_size, num_groups", [(3, 2), (4, 3)])
 class TestMaxPool2d:
+    """
+    This is the class to test the CustomMaxPool2d.
+    """
+
     @torch.no_grad()
     def test_forward(
         self, kernel_size: int, num_groups: int, inputs_2d: torch.Tensor
     ) -> None:
+        """
+        This function is the test of the forward pass.
+
+        Args:
+            kernel_size: Kernel size.
+            num_groups: Number of groups.
+            inputs_2d: Inputs fixture. Dimensions: [batch size,
+                number of channels, height, width].
+
+        Returns:
+            None.
+        """
+
         # Rename fixture
         inputs: torch.Tensor = inputs_2d
 
