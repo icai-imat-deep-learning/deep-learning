@@ -1,6 +1,6 @@
-# Project 1
+# Lab 1
 
-This project will be graded in the following way, 7 points will be graded by automatic tests, that can be verified by the criteria of a professor if it is necessary. The remaining 3 points will come from the inspection of the code by a professor.
+This lab will be graded in the following way, 7 points will be graded by automatic tests, that can be verified by the criteria of a professor if it is necessary. The remaining 3 points will come from the inspection of the code by a professor.
 
 The goal of this first lab is to implement the required source code to train and test a neural network to recognize ciphers based on the common dataset denominated MNIST (https://www.kaggle.com/datasets/hojjatk/mnist-dataset).
 
@@ -14,7 +14,7 @@ To log the metrics during training and validation, we will be using tensorboard.
 
 IMPORTANT: To submit it is only needed to push in github.
 
-# Structure of the repo
+## Structure of the repo
 In this repo, all the functional code is inside the src/ folder. For training the model and save it, the following module must be run:
 
     python -m src.train
@@ -26,18 +26,19 @@ In the src.train module there are some hyperparameters at the beginning of the m
 The evaluate file will load a model called best_model.pt inside the models/ folder compute accuracy in the test set and print it in the command line. This is the only model that will be uploaded to github.
 
 
-# Automatic tests (QA)
+## Automatic tests (QA)
+
 These tests are already provided to you, you can run them by executing:
 
     pytest .
     
 At the beginning, these tests will fail and you will have to implement the required functions properly for them to be set as PASS. The grades achieved by these tests can be overridden by the grade from a professor if the test is fulfilled but the goal of the function/class to be completed is not reached.
 
-# Inspection of the code
+## Inspection of the code
 
 These 3 points are meant to assess things that cannot be measured by automatic testing, such as code style and organization.
 
-# Parts of the project
+## Parts of the project
 
 We recommend the student follow the order we present in this section since it is the easiest and most natural one to complete the project.
 
@@ -52,11 +53,11 @@ This will be analogous to the rest of the functions.
 
 ### ReLU class (QA test, 1 point)
 
-This class is contained in the src.models and must be completed using only matrix operations. The functionality must be the same as the torch.nn.ReLU class from PyTorch.
+This class is contained in the src.models and must be completed using only matrix operations (loops or other functions as torch.where are not allowed). The functionality must be the same as the torch.nn.ReLU class from PyTorch.
 
 ### Linear class (QA test, 1 point)
 
-This class is contained in the src.models and must be completed using only matrix operations. The conventions used must be the PyTorch ones.
+This class is contained in the src.models and must be completed using only matrix operations (loops or other functions as torch.where are not allowed). The conventions used must be the PyTorch ones.
 
 ### MyModel class (QA test, 1 point)
 
@@ -66,17 +67,17 @@ This class is contained in the src.models and must be completed by calling the L
 
 This function is contained in the src.utils module and must be completed to compute the accuracy of the datasets.
 
-### Train step (Inspection)
+### train_loop function (Inspection)
 
-Implement the train functions to make the file train.py executable. This is the training step for each epoch. It should train the parameters, compute the average loss and accuracy and log them into tensorboard. Check the graphic shown in tensorboard for the train loss and make sure that it converges to zero after training has finished.
+This function is contained in the src.train_functions. This is the training loop for each epoch. It should train the parameters, compute the average loss and accuracy and log them into tensorboard. Check the graphic shown in tensorboard for the train loss and make sure that it converges to zero after training has finished.
 
-### Validation step (Inspection)
+### val_loop function (Inspection)
 
-This is the validation step for each epoch. It should compute the average loss and accuracy and log them into tensorboard.
+This function is contained in the src.train_functions. This is the validation step for each epoch. It should compute the average loss and accuracy and log them into tensorboard.
 
-### Testing step (Inspection)
+### t_loop function (Inspection)
 
-This is the test step for each epoch. It should compute the average accuracy and return it.
+This function is contained in the src.train_functions. This is the test step for each epoch. It should compute the average accuracy and return it.
 
 ### Performance (2 points)
 

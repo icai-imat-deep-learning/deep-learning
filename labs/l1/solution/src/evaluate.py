@@ -1,22 +1,24 @@
-# deep learning libraries
+"""
+This module contains the code to evaluate the models.
+"""
+
+# Standard libraries
+from typing import Final
+
+# 3pps
 import torch
 from torch.utils.data import DataLoader
 from torch.jit import RecursiveScriptModule
 
-# other libraries
-from tqdm.auto import tqdm
-from typing import Final
-
-# own modules
-from src.utils import load_data, save_model
-from src.models import MyModel
+# Own modules
+from src.utils import load_data
 from src.train_functions import t_step
 
-# static variables
+# Static variables
 DATA_PATH: Final[str] = "data"
 NUM_CLASSES: Final[int] = 10
 
-# set device
+# Set device
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 
@@ -25,17 +27,17 @@ def main() -> None:
     This function is the main program
     """
 
-    # load data
+    # Load data
     test_data: DataLoader
     _, _, test_data = load_data(DATA_PATH, batch_size=64)
 
-    # define name and writer
+    # Define name and writer
     name: str = "best_model"
 
-    # define model
+    # Define model
     model: RecursiveScriptModule = torch.jit.load(f"models/{name}.pt").to(device)
 
-    # call test step and evaluate accuracy
+    # Call test step and evaluate accuracy
     accuracy: float = t_step(model, test_data, device)
     print(f"accuracy: {accuracy}")
 

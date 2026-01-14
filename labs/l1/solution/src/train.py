@@ -10,7 +10,7 @@ from typing import Final
 # own modules
 from src.utils import load_data, save_model
 from src.models import MyModel
-from src.train_functions import train_step, val_step
+from src.train_functions import train_loop, val_loop
 
 # static variables
 DATA_PATH: Final[str] = "data"
@@ -56,10 +56,10 @@ def main() -> None:
     # train loop
     for epoch in tqdm(range(epochs)):
         # call train step
-        train_step(model, train_data, loss, optimizer, writer, epoch, device)
+        train_loop(model, train_data, loss, optimizer, writer, epoch, device)
 
         # call val step
-        val_step(model, val_data, loss, writer, epoch, device)
+        val_loop(model, val_data, loss, writer, epoch, device)
 
     # save model
     save_model(model, name)

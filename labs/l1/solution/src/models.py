@@ -1,4 +1,8 @@
-# deep learning libraries
+"""
+This module contains the code for the models.
+"""
+
+# 3pps
 import torch
 
 
@@ -7,29 +11,31 @@ class ReLU(torch.nn.Module):
     This is the class that represents the ReLU Layer.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         This method is the constructor of the ReLU layer.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
+        
+        return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
         This is the forward pass for the class.
 
         Args:
-            inputs: inputs tensor. Dimensions: [*].
+            inputs: Inputs tensor. Dimensions: [*].
 
         Returns:
-            outputs tensor. Dimensions: [*] (same as the input).
+            Outputs tensor. Dimensions: [*] (same as the input).
         """
 
-        # clone inputs
+        # Clone inputs
         outputs = inputs.clone()
 
-        # put at zero negative elements
+        # Put at zero negative elements
         outputs[outputs <= 0] = 0
 
         return outputs
@@ -38,22 +44,31 @@ class ReLU(torch.nn.Module):
 class Linear(torch.nn.Module):
     """
     This is the class that represents the Linear Layer.
+    
+    Attributes:
+        weight: Weight for the linear transformation.
+        Bias: Bias term for the linear transformation. 
     """
+    
+    # Define attributes
+    weight: torch.Tensor
+    bias: torch.Tensor
 
     def __init__(self, input_dim: int, output_dim: int) -> None:
         """
-        This method is the constructor of the Linear layer. Follow the pytorch convention.
+        This method is the constructor of the Linear layer. Follow the 
+        PyTorch convention.
 
         Args:
-            input_dim: input dimension.
-            output_dim: output dimension.
+            input_dim: Input dimension.
+            output_dim: Output dimension.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
-        # define attributes
-        self.weights: torch.nn.Parameter = torch.nn.Parameter(
+        # Define attributes
+        self.weight: torch.nn.Parameter = torch.nn.Parameter(
             torch.rand(input_dim, output_dim)
         )
         self.bias: torch.nn.Parameter = torch.nn.Parameter(torch.rand(1, output_dim))
@@ -65,14 +80,14 @@ class Linear(torch.nn.Module):
         This method if the forward pass of the layer.
 
         Args:
-            inputs: inputs tensor. Dimenions: [batch, input dim].
+            inputs: Inputs tensor. Dimensions: [batch, input dim].
 
         Returns:
-            outputs tensor. Dimensions: [batch, output dim].
+            Outputs tensor. Dimensions: [batch, output dim].
         """
 
-        # compute outputs
-        outputs: torch.Tensor = torch.matmul(inputs, self.weights) + self.bias
+        # Compute outputs
+        outputs: torch.Tensor = torch.matmul(inputs, self.weight) + self.bias
 
         return outputs
 
@@ -90,33 +105,35 @@ class MyModel(torch.nn.Module):
         This method is the constructor of the model.
 
         Args:
-            input_size: size of the input
-            output_size: size of the output
-            hidden_sizes: three hidden sizes of the model
+            input_size: Size of the input
+            output_size: Size of the output
+            hidden_sizes: Three hidden sizes of the model
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
-        # define relu
+        # Define relu
         self.relu: torch.nn.Module = ReLU()
 
-        # define layers
+        # Define layers
         self.layer1: torch.nn.Module = Linear(input_size, hidden_sizes[0])
         self.layer2: torch.nn.Module = Linear(hidden_sizes[0], hidden_sizes[1])
         self.layer3: torch.nn.Module = Linear(hidden_sizes[1], hidden_sizes[2])
         self.layer4: torch.nn.Module = Linear(hidden_sizes[2], output_size)
+        
+        return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
         This method is the forward pass of the model.
 
         Args:
-            inputs: input tensor, Dimensions: [batch, channels, height,
+            Inputs: input tensor, Dimensions: [batch, channels, height,
                 width].
 
         Returns:
-            outputs of the model. Dimensions: [batch, 1].
+            Outputs of the model. Dimensions: [batch, 1].
         """
 
         # call layers
