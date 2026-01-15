@@ -18,7 +18,7 @@ class ReLU(torch.nn.Module):
 
         # Call super class constructor
         super().__init__()
-        
+
         return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
@@ -44,19 +44,19 @@ class ReLU(torch.nn.Module):
 class Linear(torch.nn.Module):
     """
     This is the class that represents the Linear Layer.
-    
+
     Attributes:
         weight: Weight for the linear transformation.
-        Bias: Bias term for the linear transformation. 
+        Bias: Bias term for the linear transformation.
     """
-    
+
     # Define attributes
     weight: torch.Tensor
     bias: torch.Tensor
 
     def __init__(self, input_dim: int, output_dim: int) -> None:
         """
-        This method is the constructor of the Linear layer. Follow the 
+        This method is the constructor of the Linear layer. Follow the
         PyTorch convention.
 
         Args:
@@ -121,7 +121,7 @@ class MyModel(torch.nn.Module):
         self.layer2: torch.nn.Module = Linear(hidden_sizes[0], hidden_sizes[1])
         self.layer3: torch.nn.Module = Linear(hidden_sizes[1], hidden_sizes[2])
         self.layer4: torch.nn.Module = Linear(hidden_sizes[2], output_size)
-        
+
         return None
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:

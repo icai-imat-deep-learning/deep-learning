@@ -8,7 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 from src.utils import accuracy
 
 
-def train_step(
+def train_loop(
     model: torch.nn.Module,
     train_data: DataLoader,
     loss: torch.nn.Module,
@@ -40,8 +40,10 @@ def train_step(
     writer.add_scalar("train/loss", np.mean(losses), epoch)
     writer.add_scalar("train/accuracy", np.mean(accuracies), epoch)
 
+    return None
 
-def val_step(
+
+def val_loop(
     model: torch.nn.Module,
     val_data: DataLoader,
     loss: torch.nn.Module,
@@ -73,12 +75,12 @@ def t_step(
     This function computes the test step.
 
     Args:
-        model: pytorch model.
-        val_data: dataloader of test data.
-        device: device of model.
+        model: PyTorch model.
+        val_data: DataLoader of test data.
+        device: Device of model.
 
     Returns:
-        average accuracy.
+        Average accuracy.
     """
 
     # TODO

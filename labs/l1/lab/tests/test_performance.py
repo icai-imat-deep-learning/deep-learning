@@ -14,7 +14,7 @@ from src.train_functions import t_step
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 
-@pytest.mark.order(3)
+# @pytest.mark.order(3)
 @pytest.mark.parametrize("data_path", ["data"])
 def test_accuracy(data_path: str) -> None:
     """

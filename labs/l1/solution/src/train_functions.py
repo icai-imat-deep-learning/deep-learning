@@ -92,7 +92,7 @@ def val_loop(
     # activate train mode
     model.eval()
 
-    with torch.no_grad():
+    with torch.inference_mode():
         # iter over val data
         inputs: torch.Tensor
         targets: torch.Tensor
@@ -139,7 +139,7 @@ def t_step(
     # activate train mode
     model.eval()
 
-    with torch.no_grad():
+    with torch.inference_mode():
         # iter over val data
         inputs: torch.Tensor
         targets: torch.Tensor

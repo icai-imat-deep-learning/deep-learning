@@ -1,11 +1,13 @@
-# deep learning libraries
+"""
+This module contains the tests for the src.utils module.
+"""
+
+# 3pps
 import torch
 from torch.utils.data import DataLoader
-
-# other libraries
 import pytest
 
-# own modules
+# Own modules
 from src.utils import load_data, accuracy, set_seed
 
 
@@ -19,33 +21,34 @@ def test_load_data(data_path: str) -> None:
         data_path: path of the data.
     """
 
+    # Get datasets
     datasets: tuple[DataLoader, DataLoader, DataLoader] = load_data(
         data_path, batch_size=64
     )
 
-    # check length of dataloaders
+    # Check length of dataloaders
     assert len(datasets) == 3, "Incorrect length of dataloaders, it should be three"
 
-    # check train length
+    # Check train length
     assert len(datasets[0]) == 750, "Incorrect length of training dataset"
 
-    # check validation length
+    # Check validation length
     assert len(datasets[1]) == 187, "Incorrect length of validation dataset"
 
-    # check test length
+    # Check test length
     assert len(datasets[2]) == 156, "Incorrect length of test dataset"
 
-    # get element
+    # Get element
     batch: tuple[torch.Tensor, torch.Tensor] = next(iter(datasets[0]))
 
-    # check batch images shape
+    # Check batch images shape
     assert batch[0].shape == (64, 1, 28, 28), "Incorrect size of batch images"
 
-    # check batch images shape
+    # Check batch images shape
     assert batch[1].shape == (64,), "Incorrect size of batch images"
 
-    # check drop last arguments
-    assert datasets[0].drop_last == True, "Not every batch is equal size"
+    # Check drop last arguments
+    assert datasets[0].drop_last, "Not every batch is equal size"
 
     return None
 
@@ -56,7 +59,7 @@ def test_accuracy() -> None:
     This is the test for teh accuracy function.
     """
 
-    # set seed
+    # Set seed
     set_seed(42)
 
     # define predictions and target

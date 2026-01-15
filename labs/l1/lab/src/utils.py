@@ -20,15 +20,12 @@ def load_data(
     be equal size. The division between train and val must be 0.8-0.2.
 
     Args:
-        path: path to save the datasets.
+        path: path to save the datasets (train and test).
         batch_size: batch size. Defaults to 128.
 
     Returns:
         tuple of three dataloaders, train, val and test in respective order.
     """
-
-    # define transforms
-    transformations = transforms.Compose([transforms.ToTensor()])
 
     # TODO
 
@@ -95,4 +92,14 @@ def accuracy(predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
         the accuracy in a tensor of a single element.
     """
 
-    # TODO
+    # eliminate extra dimension
+    if len(targets.shape) > 1:
+        targets.squeeze(1)
+
+    # compute predictions
+    predictions = torch.argmax(predictions, dim=1)
+
+    # compute accuracy
+    accuracy: torch.Tensor = (predictions == targets).sum() / predictions.shape[0]
+
+    return accuracy

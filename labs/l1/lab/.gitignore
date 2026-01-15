@@ -5,6 +5,7 @@ models/*
 __pycache__/
 .vscode/
 .mypy_cache/
+.venv/
 
 # files
 *.csv

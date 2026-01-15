@@ -1,0 +1,34 @@
+[project]
+name = "l1-2026"
+description = "L1 2026"
+version = "2026"
+authors = [
+    {name = "Oscar Llorente Gonzalez", email = "ollorente@comillas.edu"},
+]
+readme = "README.md"
+requires-python = "==3.12.*"
+
+[tool.black]
+line-length = 88
+exclude = '''
+/(
+  \.venv
+)/
+'''
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203, W503"
+exclude = [
+    ".venv/",
+    "data/"
+]
+
+[tool.mypy]
+check_untyped_defs = true
+ignore_missing_imports = true
+exclude = [
+    ".venv/",
+    "data/"
+]
+cache_dir = "/dev/null"

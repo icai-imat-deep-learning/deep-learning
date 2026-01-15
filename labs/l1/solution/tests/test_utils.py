@@ -20,7 +20,7 @@ def test_load_data(data_path: str) -> None:
     Args:
         data_path: path of the data.
     """
-    
+
     # Get datasets
     datasets: tuple[DataLoader, DataLoader, DataLoader] = load_data(
         data_path, batch_size=64
