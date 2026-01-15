@@ -1,10 +1,14 @@
-# deep learning libraries
+"""
+This module contains the training functions.
+"""
+
+# 3pps
 import torch
-import numpy as np
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+import numpy as np
 
-# own modules
+# Own modules
 from src.utils import accuracy
 
 
