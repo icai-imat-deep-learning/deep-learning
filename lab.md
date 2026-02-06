@@ -7,3 +7,9 @@ To join the lab using the following links:
 - Class A: https://classroom.github.com/a/1dlCszdS
 
 - Class B: https://classroom.github.com/a/k1bY28lH
+
+## Lab 2
+
+- Class A: https://classroom.github.com/a/ujU9fmGw
+
+- Class B: https://classroom.github.com/a/O3bhlpV-
