@@ -3,10 +3,10 @@ This module contains the training functions.
 """
 
 # 3pps
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-import numpy as np
 
 # Own modules
 from src.utils import accuracy
@@ -34,13 +34,13 @@ def train_loop(
         device: device of model.
     """
 
-    # define metric lists
+    # Define metric lists
     losses: list[float] = []
     accuracies: list[float] = []
 
     # TODO
 
-    # write on tensorboard
+    # Write on tensorboard
     writer.add_scalar("train/loss", np.mean(losses), epoch)
     writer.add_scalar("train/accuracy", np.mean(accuracies), epoch)
 

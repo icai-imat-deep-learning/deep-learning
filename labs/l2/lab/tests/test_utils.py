@@ -1,9 +1,14 @@
-# standard libraries
+"""
+This module tests the src.utils module.
+"""
+
+# Standard libraries
 import os
 
 # 3pps
 import torch
 import pytest
+import shutil
 
 # own modules
 from src.utils import download_data, ImagenetteDataset, parameters_to_double
@@ -19,48 +24,52 @@ def test_imagenette(path: str) -> None:
         path: path for saving the data
     """
 
-    # download folders if they are not present
-    if not os.path.isdir(f"{path}"):
-        # create main dir
+    # Download folders if they are not present
+    if not (os.path.isdir(f"{path}/train") and os.path.isdir(f"{path}/val")):
+        # Delete dir if it exists
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+
+        # Create main dir
         os.makedirs(f"{path}")
 
-        # download data
+        # Download data
         download_data(path)
 
     # create datasets
     train_dataset: ImagenetteDataset = ImagenetteDataset(f"{path}/train")
     test_dataset: ImagenetteDataset = ImagenetteDataset(f"{path}/val")
 
-    # check train length
+    # Check train length
     assert (
         len(train_dataset) == 9296
     ), f"Incorrect length, got {len(train_dataset)} and it should be 9296"
 
-    # check test length
+    # Check test length
     assert (
         len(test_dataset) == 3856
     ), f"Incorrect length, got {len(test_dataset)} and it should be 3856"
 
-    # get example of output
+    # Get example of output
     element: tuple[torch.Tensor, int] = train_dataset[0]
 
-    # check number of objects returned by __getitem__
+    # Check number of objects returned by __getitem__
     assert len(element) == 2, (
         f"Incorrect number of objects returned by __getitem__ method, "
         f"2 were expected and got {len(element)}"
     )
 
-    # check first object type
+    # Check first object type
     assert isinstance(
         element[0], torch.Tensor
     ), "Incorrect object type of first element of __getitem__ output"
 
-    # check first object type
+    # Check first object type
     assert isinstance(
         element[1], int
     ), "Incorrect object type of second element of __getitem__ output"
 
-    # check first object
+    # Check first object
     assert element[0].shape == (3, 224, 224), "Incorrect shape of image tensor"
 
     return None

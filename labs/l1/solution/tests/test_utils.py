@@ -3,12 +3,12 @@ This module contains the tests for the src.utils module.
 """
 
 # 3pps
+import pytest
 import torch
 from torch.utils.data import DataLoader
-import pytest
 
 # Own modules
-from src.utils import load_data, accuracy, set_seed
+from src.utils import accuracy, load_data, set_seed
 
 
 @pytest.mark.order(1)

@@ -3,10 +3,10 @@ This module contains the training functions.
 """
 
 # 3pps
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-import numpy as np
 
 # Own modules
 from src.utils import accuracy
@@ -34,35 +34,35 @@ def train_loop(
         device: device of model.
     """
 
-    # define metric lists
+    # Define metric lists
     losses: list[float] = []
     accuracies: list[float] = []
 
-    # activate train mode
+    # Activate train mode
     model.train()
 
-    # iter over training data
+    # Iter over training data
     inputs: torch.Tensor
     targets: torch.Tensor
     for inputs, targets in train_data:
-        # pass objects to correct device
+        # Pass objects to correct device
         inputs = inputs.to(device)
         targets = targets.to(device)
 
-        # compute outputs and loss
+        # Compute outputs and loss
         outputs: torch.Tensor = model(inputs).squeeze(1)
         loss_value: torch.Tensor = loss(outputs, targets)
 
-        # optimize
+        # Optimize
         optimizer.zero_grad()
         loss_value.backward()
         optimizer.step()
 
-        # add metris to lists
+        # Add metris to lists
         losses.append(loss_value.item())
         accuracies.append(accuracy(outputs, targets).item())
 
-    # write on tensorboard
+    # Write on tensorboard
     writer.add_scalar("train/loss", np.mean(losses), epoch)
     writer.add_scalar("train/accuracy", np.mean(accuracies), epoch)
 
@@ -89,31 +89,31 @@ def val_loop(
         device: device of model.
     """
 
-    # define metric lists
+    # Define metric lists
     losses: list[float] = []
     accuracies: list[float] = []
 
-    # activate train mode
+    # Activate train mode
     model.eval()
 
     with torch.inference_mode():
-        # iter over val data
+        # Iter over val data
         inputs: torch.Tensor
         targets: torch.Tensor
         for inputs, targets in val_data:
-            # pass objects to correct device
+            # Pass objects to correct device
             inputs = inputs.to(device)
             targets = targets.to(device)
 
-            # compute outputs and loss
+            # Compute outputs and loss
             outputs: torch.Tensor = model(inputs).squeeze(1)
             loss_value: torch.Tensor = loss(outputs, targets)
 
-            # add metris to lists
+            # Add metris to lists
             losses.append(loss_value.item())
             accuracies.append(accuracy(outputs, targets).item())
 
-    # write on tensorboard
+    # Write on tensorboard
     writer.add_scalar("val/loss", np.mean(losses), epoch)
     writer.add_scalar("val/accuracy", np.mean(accuracies), epoch)
 
@@ -137,25 +137,25 @@ def t_step(
         Average accuracy.
     """
 
-    # define metric lists
+    # Define metric lists
     accuracies: list[float] = []
 
-    # activate train mode
+    # Activate train mode
     model.eval()
 
     with torch.inference_mode():
-        # iter over val data
+        # Iter over val data
         inputs: torch.Tensor
         targets: torch.Tensor
         for inputs, targets in test_data:
-            # pass objects to correct device
+            # Pass objects to correct device
             inputs = inputs.to(device)
             targets = targets.to(device)
 
-            # compute outputs and loss
+            # Compute outputs and loss
             outputs: torch.Tensor = model(inputs).squeeze(1)
 
-            # add metris to lists
+            # Add metris to lists
             accuracies.append(accuracy(outputs, targets).item())
 
     # Compute the average accuracy

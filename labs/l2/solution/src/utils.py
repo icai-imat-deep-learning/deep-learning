@@ -1,4 +1,8 @@
-# standard libraries
+"""
+This module contains auxiliary code for other modules.
+"""
+
+# Standard libraries
 import os
 import random
 import requests
@@ -32,7 +36,9 @@ class ImagenetteDataset(Dataset):
             None.
         """
 
-        # TODO
+        # set attributes
+        self.path = path
+        self.names = os.listdir(path)
 
     def __len__(self) -> int:
         """
@@ -42,7 +48,7 @@ class ImagenetteDataset(Dataset):
             Length of dataset.
         """
 
-        # TODO
+        return len(self.names)
 
     def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
         """
@@ -56,7 +62,16 @@ class ImagenetteDataset(Dataset):
             Label of the image.
         """
 
-        # TODO
+        # load image path and label
+        image_path: str = f"{self.path}/{self.names[index]}"
+        label: int = int(self.names[index].split("_")[0])
+
+        # load image
+        transformations = transforms.Compose([transforms.ToTensor()])
+        image = Image.open(image_path)
+        image_tensor: torch.Tensor = transformations(image)
+
+        return image_tensor, label
 
 
 def load_imagenette_data(
@@ -79,12 +94,16 @@ def load_imagenette_data(
         Test dataloader.
     """
 
-    # download folders if they are not present
-    if not os.path.isdir(f"{path}"):
-        # create main dir
+    # Download folders if they are not present
+    if not (os.path.isdir(f"{path}/train") and os.path.isdir(f"{path}/val")):
+        # Delete dir if it exists
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+
+        # Create main dir
         os.makedirs(f"{path}")
 
-        # download data
+        # Download data
         download_data(path)
 
     # create datasets
@@ -115,29 +134,31 @@ def download_data(path: str) -> None:
         path: Path to dave the data.
     """
 
-    # define paths
+    print
+
+    # Define paths
     url: str = "https://s3.amazonaws.com/fast-ai-imageclas/imagenette2.tgz"
     target_path: str = f"{path}/imagenette2.tgz"
 
-    # download tar file
+    # Download tar file
     response: Response = requests.get(url, stream=True)
     if response.status_code == 200:
         with open(target_path, "wb") as f:
             f.write(response.raw.read())
 
-    # extract tar file
+    # Extract tar file
     tar_file: TarFile = tarfile.open(target_path)
     tar_file.extractall(path)
     tar_file.close()
 
-    # create final save directories
+    # Create final save directories
     os.makedirs(f"{path}/train")
     os.makedirs(f"{path}/val")
 
-    # define resize transformation
+    # Define resize transformation
     transform = transforms.Resize((224, 224))
 
-    # loop for saving processed data
+    # Loop for saving processed data
     list_splits: tuple[str, str] = ("train", "val")
     for i in range(len(list_splits)):
         list_class_dirs = sorted(os.listdir(f"{path}/imagenette2/{list_splits[i]}"))
@@ -154,7 +175,7 @@ def download_data(path: str) -> None:
                 if image.im.bands == 3:
                     image.save(f"{path}/{list_splits[i]}/{j}_{k}.jpg")
 
-    # delete other files
+    # Delete other files
     os.remove(target_path)
     shutil.rmtree(f"{path}/imagenette2")
 
@@ -170,7 +191,12 @@ def parameters_to_double(model: torch.nn.Module) -> None:
         model: Torch model.
     """
 
-    # TODO
+    # iterate over model parameters
+    parameter: torch.Tensor
+    for parameter in model.parameters():
+        parameter.data = parameter.data.double()
+
+    return None
 
 
 class Accuracy:

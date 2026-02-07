@@ -118,8 +118,8 @@ def test_linear() -> None:
         # get grads values
         if model.weight.grad is None or model.bias.grad is None or inputs.grad is None:
             assert False, "Gradients not returned, none value detected"
-        grad_weight: torch.Tensor = model.weight.grad.clone()
-        grad_bias: torch.Tensor = model.bias.grad.clone()
+        grad_weight: torch.Tensor = model.weight.grad.clone()  # type: ignore
+        grad_bias: torch.Tensor = model.bias.grad.clone()  # type: ignore
         grad_inputs: torch.Tensor = inputs.grad.clone()
 
         # define torch linear
@@ -189,8 +189,8 @@ def test_conv() -> None:
         if model.weight.grad is None or model.bias.grad is None or inputs.grad is None:
             assert False, "Gradients not returned, none value detected"
         grad_inputs: torch.Tensor = inputs.grad.clone()
-        grad_weight: torch.Tensor = model.weight.grad.clone()
-        grad_bias: torch.Tensor = model.bias.grad.clone()
+        grad_weight: torch.Tensor = model.weight.grad.clone()  # type: ignore
+        grad_bias: torch.Tensor = model.bias.grad.clone()  # type: ignore
 
         # define conv
         set_seed(seed)
@@ -210,8 +210,10 @@ def test_conv() -> None:
         ):
             assert False, "Gradients not returned, none value detected"
         grad_inputs_torch: torch.Tensor = inputs.grad.clone()
-        grad_weight_torch: torch.Tensor = model_torch.weight.grad.clone()
-        grad_bias_torch: torch.Tensor = model_torch.bias.grad.clone()
+        grad_weight_torch: torch.Tensor = (
+            model_torch.weight.grad.clone()  # type: ignore
+        )
+        grad_bias_torch: torch.Tensor = model_torch.bias.grad.clone()  # type: ignore
 
         # check values of the forward
         assert torch.allclose(outputs, outputs_torch, 1e-8), "Incorrect forward"

@@ -1,4 +1,8 @@
-# standard libraries
+"""
+This module contains the code for the modules.
+"""
+
+# Standard libraries
 import math
 from typing import Any
 
@@ -54,7 +58,7 @@ class ReLU(torch.nn.Module):
         This method is the constructor of the ReLU layer.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
         self.fn = ReLUFunction.apply

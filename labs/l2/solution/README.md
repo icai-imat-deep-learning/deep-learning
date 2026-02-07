@@ -40,7 +40,7 @@ This class is contained in the src.utils module. This class is the dataset to lo
 
 ### ReLUFunction class (0.5 points)
 
-This class is contained in the src.models module. This class implements the forward and backward of the ReLU layer. To implement it you cannot use the nn pytorch module or pytorch custom operations (use only slicing and indexing).
+This class is contained in the src.models module. This class implements the forward and backward of the ReLU layer. To implement it you cannot use the nn pytorch module or pytorch custom operations (use only slicing and indexing). Keep in mind that torch.where is not allowed.
 
 ### LinearFunction class (1 point)
 
@@ -48,7 +48,7 @@ This class is contained in the src.models module. This class implements the forw
 
 ### parameters_to_double function (0.5 points)
 
-This function is contained in the src.utils module. This function changes the dtype of the parameters of a model, from float to double. It will be needed for the test of the conv layer, since otherwise the output of this layer will not be equal to the default implementation of pytorch due to underflow errors.
+This function is contained in the src.utils module. This function changes the dtype of the parameters of a model, from float to double. It will be needed for the test of the conv layer, since otherwise the output of this layer will not be equal to the default implementation of pytorch due to underflow errors. You cannot use `model.double()`, you must iterate over the parameters.
 
 ### Conv2dFunction class (2.5 points)
 

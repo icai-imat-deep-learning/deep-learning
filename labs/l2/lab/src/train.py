@@ -1,3 +1,7 @@
+"""
+This module contains the code to train models.
+"""
+
 # 3pps
 import torch
 import numpy as np
@@ -13,18 +17,17 @@ from src.utils import (
     set_seed,
 )
 
-# set device
+# Set device
 device: torch.device = (
     torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 )
 
-# set all seeds and set number of threads
+# Set all seeds and set number of threads
 set_seed(42)
 torch.set_num_threads(8)
 
-# static variables
+# Static variables
 DATA_PATH: str = "data"
-
 NUMBER_OF_CLASSES: int = 10
 
 

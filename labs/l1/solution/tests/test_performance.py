@@ -1,14 +1,18 @@
-# deep learning libraries
-import torch
-from torch.utils.data import DataLoader
-from torch.jit import RecursiveScriptModule
+"""
+This module tests the performance of the models.
+"""
 
-# other libraries
+# 3pps
 import pytest
+import torch
+from torch.jit import RecursiveScriptModule
+from torch.utils.data import DataLoader
+
+# Own modules
+from src.train_functions import t_step
 
 # own modules
 from src.utils import load_data
-from src.train_functions import t_step
 
 # set device
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")

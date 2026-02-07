@@ -48,7 +48,8 @@ class Linear(torch.nn.Module):
     def __init__(self, input_dim: int, output_dim: int) -> None:
         """
         This method is the constructor of the Linear layer. Follow the
-        PyTorch convention.
+        PyTorch convention. For the shapes you must look in the
+        PyTorch Linear layer documentation.
 
         Args:
             input_dim: Input dimension.

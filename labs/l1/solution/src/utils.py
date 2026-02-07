@@ -1,22 +1,26 @@
-# deep learning libraries
-import torch
-import torchvision
-import numpy as np
-import pandas as pd
-from torch.jit import RecursiveScriptModule
-from torch.utils.data import Dataset, DataLoader, random_split
-from torchvision import transforms
+"""
+This module contains auxiliary functionality.
+"""
 
-# other libraries
+# Standard libraries
 import os
 import random
+
+# 3pps
+import numpy as np
+import torch
+import torchvision
+from torch.jit import RecursiveScriptModule
+from torch.utils.data import DataLoader, Dataset, random_split
+from torchvision import transforms
 
 
 def load_data(
     path: str, batch_size: int = 128
 ) -> tuple[DataLoader, DataLoader, DataLoader]:
     """
-    This function loads the data from mnist dataset. All batches must
+    This function loads the data from MNIST dataset, using the
+    torchvision function (URL provided in the README). All batches must
     be equal size. The division between train and val must be 0.8-0.2.
 
     Args:
@@ -27,10 +31,10 @@ def load_data(
         tuple of three dataloaders, train, val and test in respective order.
     """
 
-    # define transforms
+    # Define transforms
     transformations = transforms.Compose([transforms.ToTensor()])
 
-    # load datasets
+    # Load datasets
     train_dataset = torchvision.datasets.MNIST(
         root=path, train=True, download=True, transform=transformations
     )
@@ -40,7 +44,7 @@ def load_data(
         root=path, train=False, download=True, transform=transformations
     )
 
-    # define dataloaders
+    # Define dataloaders
     train_dataloader = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True, drop_last=True
     )
@@ -64,12 +68,12 @@ def save_model(model: torch.nn.Module, name: str) -> None:
         name: name of the model (without the extension, e.g. name.pt).
     """
 
-    # create folder if it does not exist
+    # Create folder if it does not exist
     if not os.path.isdir("models"):
         os.makedirs("models")
 
-    # save scripted model
-    model_scripted = torch.jit.script(model.cpu())
+    # Save scripted model
+    model_scripted: RecursiveScriptModule = torch.jit.script(model.cpu())
     model_scripted.save(f"models/{name}.pt")
 
     return None
@@ -80,14 +84,14 @@ def set_seed(seed: int) -> None:
     This function sets a seed and ensure a deterministic behavior
 
     Args:
-        seed: seed number to fix radomness
+        seed: Seed number to fix radomness.
     """
 
-    # set seed in numpy and random
+    # Set seed in numpy and random
     np.random.seed(seed)
     random.seed(seed)
 
-    # set seed and deterministic algorithms for torch
+    # Set seed and deterministic algorithms for torch
     torch.manual_seed(seed)
     torch.use_deterministic_algorithms(True, warn_only=True)
 
@@ -97,7 +101,7 @@ def set_seed(seed: int) -> None:
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-    # for deterministic behavior on cuda >= 10.2
+    # For deterministic behavior on cuda >= 10.2
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 
     return None
@@ -108,22 +112,22 @@ def accuracy(predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
     This function computes the accuracy.
 
     Args:
-        predictions: predictions tensor. Dimensions:
+        predictions: Predictions tensor. Dimensions:
             [batch, num classes] or [batch].
-        targets: targets tensor. Dimensions: [batch, 1] or [batch].
+        targets: Targets tensor. Dimensions: [batch, 1] or [batch].
 
     Returns:
-        the accuracy in a tensor of a single element.
+        Accuracy in a tensor of a single element.
     """
 
-    # eliminate extra dimension
+    # Eliminate extra dimension
     if len(targets.shape) > 1:
         targets.squeeze(1)
 
-    # compute predictions
+    # Compute predictions
     predictions = torch.argmax(predictions, dim=1)
 
-    # compute accuracy
-    accuracy: torch.Tensor = (predictions == targets).sum() / predictions.shape[0]
+    # Compute accuracy
+    score: torch.Tensor = (predictions == targets).sum() / predictions.shape[0]
 
-    return accuracy
+    return score

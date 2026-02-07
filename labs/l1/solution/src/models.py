@@ -57,7 +57,8 @@ class Linear(torch.nn.Module):
     def __init__(self, input_dim: int, output_dim: int) -> None:
         """
         This method is the constructor of the Linear layer. Follow the
-        PyTorch convention.
+        PyTorch convention. For the shapes you must look in the
+        PyTorch Linear layer documentation.
 
         Args:
             input_dim: Input dimension.
@@ -69,9 +70,9 @@ class Linear(torch.nn.Module):
 
         # Define attributes
         self.weight: torch.nn.Parameter = torch.nn.Parameter(
-            torch.rand(input_dim, output_dim)
+            torch.rand(output_dim, input_dim)
         )
-        self.bias: torch.nn.Parameter = torch.nn.Parameter(torch.rand(1, output_dim))
+        self.bias: torch.nn.Parameter = torch.nn.Parameter(torch.rand(output_dim))
 
         return None
 
@@ -87,7 +88,7 @@ class Linear(torch.nn.Module):
         """
 
         # Compute outputs
-        outputs: torch.Tensor = torch.matmul(inputs, self.weight) + self.bias
+        outputs: torch.Tensor = torch.matmul(inputs, self.weight.T) + self.bias
 
         return outputs
 
@@ -136,7 +137,7 @@ class MyModel(torch.nn.Module):
             Outputs of the model. Dimensions: [batch, 1].
         """
 
-        # call layers
+        # Call layers
         outputs: torch.Tensor = torch.flatten(inputs, start_dim=1)
         outputs = self.layer1(outputs)
         outputs = self.relu(outputs)

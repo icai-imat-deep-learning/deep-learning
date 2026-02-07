@@ -7,12 +7,12 @@ from typing import Final
 
 # 3pps
 import torch
-from torch.utils.data import DataLoader
 from torch.jit import RecursiveScriptModule
+from torch.utils.data import DataLoader
 
 # Own modules
-from src.utils import load_data
 from src.train_functions import t_step
+from src.utils import load_data
 
 # Static variables
 DATA_PATH: Final[str] = "data"

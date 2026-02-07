@@ -32,3 +32,14 @@ exclude = [
     "data/"
 ]
 cache_dir = "/dev/null"
+
+[tool.pylint]
+max-line-length = 88
+disable = "R0801,R0912,R0913,R0914,R0915,R0917,R1711,R1732,W1203,R0902,W0707,C0114"
+
+[tool.isort]
+profile = "black"
+import_heading_stdlib = "Standard libraries"
+import_heading_thirdparty = "3pps"
+import_heading_firstparty = "Own modules"
+line_length = 88

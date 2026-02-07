@@ -3,11 +3,11 @@ This module contains the tests for the src.models.
 """
 
 # 3pps
-import torch
 import pytest
+import torch
 
 # Own modules
-from src.models import ReLU, Linear, MyModel
+from src.models import Linear, MyModel, ReLU
 
 
 @pytest.mark.order(2)
@@ -66,49 +66,43 @@ def test_relu() -> None:
 
 
 @pytest.mark.order(3)
-@pytest.mark.parametrize("input_dim, output_dim", [(5, 10)])
-def test_linear(input_dim: int, output_dim: int) -> None:
+@pytest.mark.parametrize(
+    "batch_size, input_dim, output_dim", [(32, 5, 10), (64, 10, 1)]
+)
+def test_linear(batch_size: int, input_dim: int, output_dim: int) -> None:
     """
     This is the test for the Linear class.
 
     Args:
+        batch_size: Batch size for the inputs.
         input_dim: Dimension of the input.
         output_dim: Dimension of he output.
     """
 
-    # Define linear class
-    linear: torch.nn.Module = Linear(input_dim, output_dim)
-    parameters: list[torch.nn.Parameter] = list(linear.parameters())
+    # Define models
+    model: torch.nn.Module = Linear(input_dim, output_dim)
+    model_torch: torch.nn.Module = torch.nn.Linear(input_dim, output_dim)
+
+    # Get parameters
+    parameters: list[torch.nn.Parameter] = list(model.parameters())
 
     # Check number of parameters
     assert len(parameters) == 2, "Incorrect number of parameters, they must be 2"
 
-    # Define which parameter is the weights and which one is the bias
-    if parameters[1].shape[0] == 1:
-        weight_index: int = 0
-        bias_index: int = 1
-
-    else:
-        weight_index = 1
-        bias_index = 0
-
     # Check shape of the weights
-    assert parameters[weight_index].shape == (
-        input_dim,
-        output_dim,
-    ), "Incorrect weight shape"
+    assert model.weight.shape == model_torch.weight.shape, "Incorrect weight shape"
 
     # Check shape of the bias
-    assert parameters[bias_index].shape == (1, output_dim), "Incorrect bias shape"
+    assert model.bias.shape == model.bias.shape, "Incorrect bias shape"
 
     # Get output
-    output: torch.Tensor = linear(torch.rand(64, input_dim))
+    output: torch.Tensor = model(torch.rand(batch_size, input_dim))
 
     # Check object
     assert isinstance(output, torch.Tensor), "Incorrect output object type"
 
     # Check shape of output
-    assert output.shape == (64, output_dim), "Incorrect shape of output"
+    assert output.shape == (batch_size, output_dim), "Incorrect shape of output"
 
     return None
 

@@ -1,8 +1,12 @@
+"""
+This module contains rhe data for the evaluation of the models.
+"""
+
 # 3pps
 import torch
 from torch.jit import RecursiveScriptModule
 
-# own modules
+# Own modules
 from src.utils import (
     load_imagenette_data,
     Accuracy,
@@ -10,16 +14,16 @@ from src.utils import (
     set_seed,
 )
 
-# set device
+# Set device
 device: torch.device = (
     torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 )
 
-# set all seeds and set number of threads
+# Set all seeds and set number of threads
 set_seed(42)
 torch.set_num_threads(8)
 
-# static variables
+# Static variables
 DATA_PATH: str = "data"
 
 
@@ -28,7 +32,7 @@ def main(name: str) -> float:
     This function is the main program for the testing.
     """
 
-    # check device
+    # Check device
     print(f"device: {device}")
 
     (
@@ -37,13 +41,13 @@ def main(name: str) -> float:
         test_data,
     ) = load_imagenette_data(DATA_PATH, batch_size=128, num_workers=4)
 
-    # define model
+    # Define model
     model: RecursiveScriptModule = load_model(name).to(device)
 
-    # define accuracy
+    # Define accuracy
     accuracy: Accuracy = Accuracy()
 
-    # train step loop
+    # Train step loop
     for images, labels in test_data:
         # pass images and labels to the correct device
         images = images.to(device)

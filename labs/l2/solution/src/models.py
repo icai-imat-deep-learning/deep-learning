@@ -1,4 +1,8 @@
-# standard libraries
+"""
+This module contains the code for the modules.
+"""
+
+# Standard libraries
 import math
 from typing import Any
 
@@ -26,10 +30,10 @@ class ReLUFunction(torch.autograd.Function):
             Outputs tensor. Dimensions: [*], same as inputs.
         """
 
-        # save tensors for the backward
+        # Save tensors for the backward
         ctx.save_for_backward(inputs)
 
-        # compute forward
+        # Compute forward
         outputs = inputs.clone()
         outputs[outputs <= 0] = 0
 
@@ -48,10 +52,10 @@ class ReLUFunction(torch.autograd.Function):
             Inputs gradients. Dimensions: [*], same as the grad_output.
         """
 
-        # load tensors from the forward
+        # Load tensors from the forward
         (inputs,) = ctx.saved_tensors
 
-        # compute gradients
+        # Compute gradients
         grad_input: torch.Tensor = torch.ones_like(inputs)
         grad_input[inputs <= 0] = 0
         grad_input *= grad_output
@@ -69,7 +73,7 @@ class ReLU(torch.nn.Module):
         This method is the constructor of the ReLU layer.
         """
 
-        # call super class constructor
+        # Call super class constructor
         super().__init__()
 
         self.fn = ReLUFunction.apply
@@ -112,7 +116,7 @@ class LinearFunction(torch.autograd.Function):
             Outputs tensor. Dimensions: [batch, output dimension].
         """
 
-        # save elements for backward
+        # Save elements for backward
         ctx.save_for_backward(inputs, weight, bias)
 
         return torch.matmul(inputs, weight.T) + bias.unsqueeze(0)

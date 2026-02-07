@@ -2,7 +2,9 @@
 
 This lab will be graded in the following way, 7 points will be graded by automatic tests, that can be verified by the criteria of a professor if it is necessary. The remaining 3 points will come from the inspection of the code by a professor.
 
-The goal of this first lab is to implement the required source code to train and test a neural network to recognize ciphers based on the common dataset denominated MNIST (https://www.kaggle.com/datasets/hojjatk/mnist-dataset).
+The goal of this first lab is to implement the required source code to train and test a neural network to recognize ciphers based on the common dataset denominated MNIST. The dataset must be downloaded with the torchvision function provided for it (https://docs.pytorch.org/vision/main/generated/torchvision.datasets.MNIST.html). 
+
+In case you want to explore the dataset, here you have also a link to it in kaggle, but do not use it doe the lab since it has a different format: https://www.kaggle.com/datasets/hojjatk/mnist-dataset.
 
 This dataset consists on a large set of handwritten digits. The provided source code is a pytorch project with the function to load data, train the data, test it and extract metrics. Parts of the source code is missing and you will have to complete it to be able to successfully train the network.
 
@@ -81,4 +83,4 @@ This function is contained in the src.train_functions. This is the test step for
 
 ### Performance (2 points)
 
-This is not a specific function but a performance you should achieve with your best model in the test set. A performance higher than 94% would have a score of 1 point, higher than 96% 1.5 and higher than 97% 2 points. You should try to play with the hyperparameters and then rename your best model as best_model.pt inside the models' folder. Please note that the test implemented for the performance part will fail if your train model does not reach the accuracy thresholds defined above.
+This is not a specific function but a performance you should achieve with your best model in the test set. A performance higher than 94% would have a score of 1 point, higher than 96% 1.5 and higher than 97% 2 points. You should try to play with the hyperparameters and then rename your best model as `best_model.pt` inside the models' folder. Please note that the test implemented for the performance part will fail if your train model does not reach the accuracy thresholds defined above.
