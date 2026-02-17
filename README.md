@@ -9,3 +9,7 @@ In this part you will find the official calendars for the class with the dates f
 ## Theory
 
 In this section you will find the slides for the material for the different classes.
+
+## Lab
+
+In this folder you will find resources for the labs. First, in the `github.md` you will find the links for the different labs.
