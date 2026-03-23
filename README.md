@@ -12,7 +12,7 @@ In this section you will find the slides for the material for the different clas
 
 ## Lab
 
-In this folder you will find resources for the labs. First, in the `github.md` you will find the links for the different labs.
+In this folder you will find resources for the labs. First, in the `lab/github.md` you will find the links for the different labs.
 
 ## Exams
 

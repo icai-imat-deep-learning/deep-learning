@@ -19,3 +19,9 @@ To join the lab using the following links:
 - Class A: https://classroom.github.com/a/ycu4hP7X
 
 - Class B: https://classroom.github.com/a/K6UJKaM7
+
+## Lab 3 - Part 2
+
+- Class A: https://classroom.github.com/a/OqTB90vw
+
+- Class B: https://classroom.github.com/a/9AGUMR_5
